@@ -20,7 +20,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @NoArgsConstructor
 @TableName("account")
 public class Account  {
-//账户ID@TableId
+//账户ID
+    @TableId
     private Long accountId;
 
 //用户名

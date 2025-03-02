@@ -2,7 +2,6 @@ package cn.polister.infosys.entity;
 
 import java.util.Date;
 
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @NoArgsConstructor
 @TableName("exercise_log")
 public class ExerciseLog  {
-//日志ID@TableId
+//日志ID
+    @TableId
     private Long logId;
 
 //账户ID

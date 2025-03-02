@@ -20,7 +20,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @NoArgsConstructor
 @TableName("diet_log")
 public class DietLog  {
-//日志ID@TableId
+//日志ID
+    @TableId
     private Long logId;
 
 //账户ID

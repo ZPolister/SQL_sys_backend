@@ -20,7 +20,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @NoArgsConstructor
 @TableName("health_goal")
 public class HealthGoal  {
-//目标ID@TableId
+//目标ID
+    @TableId
     private Long goalId;
 
 //账户ID

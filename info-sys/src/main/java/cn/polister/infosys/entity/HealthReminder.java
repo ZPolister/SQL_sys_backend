@@ -2,7 +2,6 @@ package cn.polister.infosys.entity;
 
 import java.util.Date;
 
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @NoArgsConstructor
 @TableName("health_reminder")
 public class HealthReminder  {
-//提醒ID@TableId
+//提醒ID
+    @TableId
     private Long reminderId;
 
 //账户ID
