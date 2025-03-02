@@ -4,9 +4,12 @@ package cn.polister.infosys.handler.exception;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.exception.SystemException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @RestControllerAdvice
 @Slf4j
@@ -20,6 +23,29 @@ public class GlobalExceptionHandler {
         return ResponseResult.errorResult(e.getCode(), e.getMsg());
     }
 
+    // 处理参数校验异常（@RequestBody）
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseResult handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        return ResponseResult.errorResult(400, ex.getMessage());
+    }
+
+    // 处理参数校验异常（@RequestParam）
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseResult handleConstraintViolation(ConstraintViolationException ex) {
+        return ResponseResult.errorResult(
+                400,
+                ex.getConstraintViolations().iterator().next().getMessage()
+        );
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseResult handleConstraintViolation(HandlerMethodValidationException ex) {
+        return ResponseResult.errorResult(
+                400,
+                ex.getAllValidationResults().stream().findFirst().get()
+                        .getResolvableErrors().stream().findFirst().get().getDefaultMessage()
+        );
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseResult exceptionHandler(Exception e) {

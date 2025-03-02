@@ -1,6 +1,7 @@
 package cn.polister.infosys.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.polister.infosys.constants.AuthConstants;
 import cn.polister.infosys.entity.Account;
 import cn.polister.infosys.entity.dto.LoginDto;
 import cn.polister.infosys.entity.dto.RegisterDto;
@@ -12,6 +13,7 @@ import cn.polister.infosys.utils.PasswordUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static cn.polister.infosys.constants.AuthConstants.VERIFY_CODE_KEY;
 
 /**
  * 账户表(Account)表服务实现类
@@ -34,13 +39,37 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     private final RedisTemplate<String, String> redisTemplate;
     private final JavaMailSender mailSender;
 
-    private static final String VERIFY_CODE_KEY = "verify_code:";
-    private static final Duration CODE_EXPIRE = Duration.ofMinutes(5);
+    @Value("${mail.from}")
+    private String fromMail;
 
     public void sendVerificationCode(String email) {
+
+        checkRequestFrequency(email);
+
         String code = generateRandomCode();
-        redisTemplate.opsForValue().set(VERIFY_CODE_KEY + email, code, CODE_EXPIRE);
+        redisTemplate.opsForValue().set(AuthConstants.VERIFY_CODE_KEY + email, code, AuthConstants.CODE_EXPIRE);
         sendVerificationEmail(email, code);
+    }
+
+    private void checkRequestFrequency(String email) {
+        String intervalKey = AuthConstants.VERIFY_CODE_INTERVAL_KEY + email;
+        String lastSent = redisTemplate.opsForValue().get(intervalKey);
+
+        if (lastSent != null) {
+            long lastTime = Long.parseLong(lastSent);
+            long remainSeconds = AuthConstants.CODE_INTERVAL.getSeconds() -
+                    (System.currentTimeMillis() - lastTime) / 1000;
+
+            if (remainSeconds > 0) {
+                throw new SystemException(AppHttpCodeEnum.EMAIL_CODE_SEND);
+            }
+        }
+
+        redisTemplate.opsForValue().set(
+                intervalKey,
+                String.valueOf(System.currentTimeMillis()),
+                AuthConstants.CODE_INTERVAL
+        );
     }
 
     private String generateRandomCode() {
@@ -49,7 +78,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     private void sendVerificationEmail(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("noreply@health.com");
+        message.setFrom(fromMail);
         message.setTo(to);
         message.setSubject("健康管理系统注册验证码");
         message.setText("您的验证码是：" + code + "，有效期为5分钟");

@@ -27,7 +27,7 @@ public class AuthController {
     @PostMapping("/send-code")
     public ResponseResult sendVerificationCode(
             @Parameter(description = "注册邮箱", required = true, example = "user@example.com")
-            @RequestParam @Email String email) {
+            @RequestParam @Email(message = "邮箱格式错误") String email) {
         accountService.sendVerificationCode(email);
         return ResponseResult.okResult();
     }
