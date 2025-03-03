@@ -27,7 +27,8 @@ public enum AppHttpCodeEnum {
     NICKNAME_NOT_NULL(509,  "别名不能为空"),
     EMAIL_CODE_ERROR(510,"验证码错误或已过期"),
     USER_BANNED(511, "用户已被禁用"),
-    EMAIL_CODE_SEND(512, "验证码请求过于频繁");
+    EMAIL_CODE_SEND(512, "验证码请求过于频繁"),
+    DATA_NOT_EXIST(513, "数据不存在");
 
 
     final int code;

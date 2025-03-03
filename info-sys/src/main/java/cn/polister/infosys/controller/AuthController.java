@@ -1,5 +1,6 @@
 package cn.polister.infosys.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.entity.dto.LoginDto;
 import cn.polister.infosys.entity.dto.RegisterDto;
@@ -44,10 +45,18 @@ public class AuthController {
 
     @Operation(summary = "用户登录", description = "使用用户名/邮箱登录获取Token")
     @ApiResponse(responseCode = "200", description = "登录成功")
-    @ApiResponse(responseCode = "401", description = "用户名或密码错误")
+    @ApiResponse(responseCode = "505", description = "用户名或密码错误")
+    @ApiResponse(responseCode = "511", description = "账户被禁用")
     @PostMapping("/login")
     public ResponseResult login(@RequestBody LoginDto dto) {
         String token = accountService.login(dto);
         return ResponseResult.okResult(Collections.singletonMap("token", token));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "退出登录", description = "退出当前登录")
+    public ResponseResult logout() {
+        StpUtil.logout();
+        return ResponseResult.okResult();
     }
 }
