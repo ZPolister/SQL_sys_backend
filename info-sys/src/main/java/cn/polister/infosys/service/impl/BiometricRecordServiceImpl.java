@@ -20,7 +20,7 @@ import java.util.Date;
 @Service("biometricRecordService")
 public class BiometricRecordServiceImpl extends ServiceImpl<BiometricRecordMapper, BiometricRecord> implements BiometricRecordService {
     @Override
-    public Page<BiometricRecord> getRecordsWithDateRange(Date startTime, Date endTime, Integer pageNum, Integer pageSize) {
+    public Page<BiometricRecord> getBiometricRecordsWithDateRange(Date startTime, Date endTime, Integer pageNum, Integer pageSize) {
         Page<BiometricRecord> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<BiometricRecord> wrapper = new LambdaQueryWrapper<>();
 

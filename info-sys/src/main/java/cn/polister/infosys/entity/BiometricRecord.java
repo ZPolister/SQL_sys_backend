@@ -1,7 +1,9 @@
 package cn.polister.infosys.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
+import cn.hutool.core.date.DateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +40,7 @@ public class BiometricRecord  {
 //血脂(mmol/L)
     private Double bloodLipid;
 //测量时间
-    private Date measurementTime;
+    private LocalDateTime measurementTime;
 //创建时间
     private Date createdAt;
 

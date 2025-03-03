@@ -36,7 +36,7 @@ public class HealthDataController {
             @Valid @RequestBody BiometricRecordDto dto) {
 
         // 校验
-        if (dto.getSystolic() <= dto.getDiastolic()) {
+        if (dto.getSystolicPressure() <= dto.getDiastolicPressure()) {
             return ResponseResult.errorResult(
                     400,
                     "收缩压必须大于舒张压"
@@ -98,13 +98,13 @@ public class HealthDataController {
     // 分页获取带日期筛选
     @SaCheckLogin
     @GetMapping("/records")
-    public ResponseResult getRecords(
+    public ResponseResult getBiometricRecords(
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
-        Page<BiometricRecord> page = biometricRecordService.getRecordsWithDateRange(
+        Page<BiometricRecord> page = biometricRecordService.getBiometricRecordsWithDateRange(
                 startTime, endTime, pageNum, pageSize
         );
         return ResponseResult.okResult(page);

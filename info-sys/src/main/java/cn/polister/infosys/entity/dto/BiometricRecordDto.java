@@ -9,24 +9,24 @@ import java.time.LocalDateTime;
 @Data
 public class BiometricRecordDto {
     @DecimalMin(value = "50.0", message = "身高最小50cm")
-    private BigDecimal height;
+    private Double heightCm;
 
     @DecimalMin(value = "2.5", message = "体重最小2.5kg")
-    private BigDecimal weight;
+    private Double weightKg;
 
     @NotNull(message = "收缩压不能为空")
     @Min(60) @Max(250)
-    private Integer systolic;
+    private Integer systolicPressure;
 
     @NotNull(message = "舒张压不能为空")
     @Min(40) @Max(150)
-    private Integer diastolic;
+    private Integer diastolicPressure;
 
     @DecimalMin("2.0") @DecimalMax("30.0")
-    private BigDecimal bloodSugar;
+    private Double bloodGlucose;
 
     @DecimalMin("0.5") @DecimalMax("10.0")
-    private BigDecimal bloodLipid;
+    private Double bloodLipid;
 
     @NotNull
     private LocalDateTime measurementTime;

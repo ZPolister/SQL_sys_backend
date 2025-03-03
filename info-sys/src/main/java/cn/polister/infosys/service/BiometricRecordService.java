@@ -14,5 +14,5 @@ import java.util.Date;
  * @since 2025-03-02 20:44:36
  */
 public interface BiometricRecordService extends IService<BiometricRecord> {
-    Page<BiometricRecord> getRecordsWithDateRange(Date startTime, Date endTime, Integer pageNum, Integer pageSize);
+    Page<BiometricRecord> getBiometricRecordsWithDateRange(Date startTime, Date endTime, Integer pageNum, Integer pageSize);
 }
