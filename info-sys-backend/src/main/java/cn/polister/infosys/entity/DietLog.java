@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @NoArgsConstructor
 @TableName("diet_log")
 public class DietLog  {
-//日志ID
+//日志ID（数据库自动生成，无需传输）
     @TableId
     private Long logId;
 
@@ -34,8 +34,6 @@ public class DietLog  {
     private Integer totalCalories;
 //食用时间
     private Date consumptionTime;
-//创建时间
+//创建时间（自动生成，无需传输）
     private Date createdAt;
-
-
 }

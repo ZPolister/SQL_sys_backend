@@ -1,5 +1,6 @@
 package cn.polister.infosys.entity.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -8,26 +9,25 @@ import java.time.LocalDateTime;
 
 @Data
 public class BiometricRecordDto {
-    @DecimalMin(value = "50.0", message = "身高最小50cm")
+
+    @Schema(description = "身高(cm)", minimum = "50.0", example = "175.5")
     private Double heightCm;
 
-    @DecimalMin(value = "2.5", message = "体重最小2.5kg")
+    @Schema(description = "体重(kg)", minimum = "2.5", example = "65.3")
     private Double weightKg;
 
-    @NotNull(message = "收缩压不能为空")
-    @Min(60) @Max(250)
+    @Schema(description = "收缩压(mmHg)", minimum = "60", maximum = "250", example = "120")
     private Integer systolicPressure;
 
-    @NotNull(message = "舒张压不能为空")
-    @Min(40) @Max(150)
+    @Schema(description = "舒张压(mmHg)", minimum = "40", maximum = "150", example = "80")
     private Integer diastolicPressure;
 
-    @DecimalMin("2.0") @DecimalMax("30.0")
+    @Schema(description = "血糖(mmol/L)", minimum = "2.0", maximum = "30.0", example = "5.6")
     private Double bloodGlucose;
 
-    @DecimalMin("0.5") @DecimalMax("10.0")
+    @Schema(description = "血脂(mmol/L)", minimum = "0.5", maximum = "10.0", example = "1.8")
     private Double bloodLipid;
 
-    @NotNull
+    @Schema(description = "测量时间", example = "2024-03-15T14:30:00")
     private LocalDateTime measurementTime;
 }

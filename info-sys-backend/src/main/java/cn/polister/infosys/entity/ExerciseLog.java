@@ -19,7 +19,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @NoArgsConstructor
 @TableName("exercise_log")
 public class ExerciseLog  {
-//日志ID
+//日志ID（由数据库创建，无需传输）
     @TableId
     private Long logId;
 
@@ -37,6 +37,5 @@ public class ExerciseLog  {
     private Integer caloriesBurned;
 //创建时间
     private Date createdAt;
-
 
 }
