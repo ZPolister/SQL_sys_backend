@@ -5,4 +5,4 @@ COPY info-sys-backend/target/info-sys-backend-0.0.1-SNAPSHOT.jar /usr/app/
 
 EXPOSE 36002
 
-ENTRYPOINT ["java","-jar","/usr/app/info-sys-backend-0.0.1-SNAPSHOT.jar",""]
+ENTRYPOINT ["java","-jar","/usr/app/info-sys-backend-0.0.1-SNAPSHOT.jar","--spring.profiles.active=product"]
