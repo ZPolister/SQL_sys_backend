@@ -1,0 +1,94 @@
+package cn.polister.infosys.controller;
+
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.polister.infosys.entity.ResponseResult;
+import cn.polister.infosys.entity.dto.SleepLogDto;
+import cn.polister.infosys.service.SleepLogService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+
+// 3. Controller（带完整OpenAPI注释）
+@RestController
+@RequestMapping("/sleep")
+@Tag(name = "睡眠记录管理", description = "睡眠数据管理接口")
+public class SleepLogController {
+
+    @Resource
+    private SleepLogService sleepLogService;
+
+    @Operation(
+            summary = "新增睡眠记录",
+            description = "需要登录，参数要求：<br>" +
+                    "1. 入睡/醒来时间不能为空且需早于当前时间<br>" +
+                    "2. 醒来时间需晚于入睡时间<br>" +
+                    "3. 睡眠质量等级1-5",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(schema = @Schema(implementation = SleepLogDto.class))
+            )
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "记录创建成功"),
+            @ApiResponse(responseCode = "400", description = "参数校验失败"),
+            @ApiResponse(responseCode = "401", description = "未登录访问")
+    })
+    @SaCheckLogin
+    @PostMapping
+    public ResponseResult createLog(@RequestBody SleepLogDto dto) {
+        return sleepLogService.createSleepLog(dto);
+    }
+
+    @Operation(
+            summary = "删除睡眠记录",
+            description = "根据记录ID删除指定记录",
+            parameters = @Parameter(name = "logId", description = "记录ID", example = "123")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "400", description = "记录不存在/无权限"),
+            @ApiResponse(responseCode = "401", description = "未登录访问")
+    })
+    @SaCheckLogin
+    @DeleteMapping("/{logId}")
+    public ResponseResult deleteLog(@PathVariable Long logId) {
+        return sleepLogService.deleteSleepLog(logId);
+    }
+
+    @Operation(
+            summary = "分页查询睡眠记录",
+            description = "支持按入睡时间范围筛选",
+            parameters = {
+                    @Parameter(name = "startDate", description = "开始日期(yyyy-MM-dd)", example = "2024-03-01"),
+                    @Parameter(name = "endDate", description = "结束日期(yyyy-MM-dd)", example = "2024-03-31"),
+                    @Parameter(name = "pageNum", description = "页码（默认1）", example = "1"),
+                    @Parameter(name = "pageSize", description = "每页数量（默认10）", example = "20")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "查询成功"),
+            @ApiResponse(responseCode = "401", description = "未登录访问")
+    })
+    @SaCheckLogin
+    @GetMapping
+    public ResponseResult getLogs(
+            @RequestParam(required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        return ResponseResult.okResult(sleepLogService.getSleepLogs(startDate, endDate, pageNum, pageSize));
+    }
+}
