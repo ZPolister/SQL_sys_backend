@@ -29,7 +29,7 @@ public class ExerciseLogServiceImpl extends ServiceImpl<ExerciseLogMapper, Exerc
 
     @Override
     public ResponseResult createExerciseLog(ExerciseLogDto dto) {
-        // 手动校验逻辑
+        // 校验
         if (StringUtils.isBlank(dto.getExerciseType())) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID,"运动类型不能为空");
         }

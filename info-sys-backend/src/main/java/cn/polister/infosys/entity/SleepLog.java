@@ -33,6 +33,4 @@ public class SleepLog  {
     private Integer sleepQuality;
 //创建时间
     private Date createdAt;
-
-
 }
