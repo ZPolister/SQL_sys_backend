@@ -19,4 +19,6 @@ public interface DietLogService extends IService<DietLog> {
     ResponseResult createDietLog(DietLogDto dto);
     ResponseResult deleteDietLog(Long logId);
     Page<DietLog> getDietLogs(Date startDate, Date endDate, Integer pageNum, Integer pageSize);
+
+    Double getHotToday();
 }

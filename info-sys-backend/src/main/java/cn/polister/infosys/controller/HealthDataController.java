@@ -103,6 +103,7 @@ public class HealthDataController {
     }
 
     // 分页获取带日期筛选
+    @Operation(summary = "分页获取生物特征记录", description = "日期为可选")
     @SaCheckLogin
     @GetMapping("/records")
     public ResponseResult getBiometricRecords(
@@ -115,5 +116,12 @@ public class HealthDataController {
                 startTime, endTime, pageNum, pageSize
         );
         return ResponseResult.okResult(page);
+    }
+
+    @Operation(summary = "获取最新一次生物特征记录")
+    @GetMapping("/latest")
+    @SaCheckLogin
+    public ResponseResult getLatestRecord() {
+        return ResponseResult.okResult(biometricRecordService.getLatestBiometricRecord(StpUtil.getLoginIdAsLong()));
     }
 }

@@ -82,21 +82,21 @@ public class ExerciseLogServiceImpl extends ServiceImpl<ExerciseLogMapper, Exerc
     }
 
     public Double getTotalCaloriesAfter(Long accountId, Date startDate) {
-        QueryWrapper<ExerciseLog> wrapper = new QueryWrapper<>();
-        wrapper.eq("account_id", accountId)
-                .ge("start_timestamp", startDate)
-                .select("SUM(calories_burned) as caloriesBurned");
+        LambdaQueryWrapper<ExerciseLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ExerciseLog::getAccountId, accountId)
+                .ge(ExerciseLog::getStartTimestamp, startDate);
 
-        Map<String, Object> map = this.getMap(wrapper);
-        if (map == null || map.get("caloriesBurned") == null) {
-            return 0.0;
-        }
+        return this.baseMapper.selectList(wrapper)
+                 .stream().mapToDouble(ExerciseLog::getCaloriesBurned).sum();
+    }
 
-        // 处理不同数据库返回类型
-        Object result = map.get("caloriesBurned");
-        if (result instanceof Long) {
-            return ((Long) result).doubleValue();
-        }
-        return (Double) result;
+    @Override
+    public ExerciseLog getLatestLog() {
+        LambdaQueryWrapper<ExerciseLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ExerciseLog::getAccountId, StpUtil.getLoginIdAsLong())
+                .orderByDesc(ExerciseLog::getCreatedAt)
+                .last("LIMIT 1");
+
+        return this.getOne(wrapper);
     }
 }

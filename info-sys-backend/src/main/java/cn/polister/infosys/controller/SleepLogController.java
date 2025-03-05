@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
-// 3. Controller（带完整OpenAPI注释）
 @RestController
 @RequestMapping("/sleep")
 @Tag(name = "睡眠记录管理", description = "睡眠数据管理接口")
@@ -78,7 +77,7 @@ public class SleepLogController {
             @ApiResponse(responseCode = "401", description = "未登录访问")
     })
     @SaCheckLogin
-    @GetMapping
+    @GetMapping("/page")
     public ResponseResult getLogs(
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
@@ -91,4 +90,11 @@ public class SleepLogController {
 
         return ResponseResult.okResult(sleepLogService.getSleepLogs(startDate, endDate, pageNum, pageSize));
     }
+
+    @SaCheckLogin
+    @GetMapping("/latest")
+    public ResponseResult getLatest() {
+        return ResponseResult.okResult(sleepLogService.getLatestRecord());
+    }
+
 }

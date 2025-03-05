@@ -20,4 +20,5 @@ public interface SleepLogService extends IService<SleepLog> {
     ResponseResult deleteSleepLog(Long logId);
     Page<SleepLog> getSleepLogs(Date startDate, Date endDate, Integer pageNum, Integer pageSize);
 
+    SleepLog getLatestRecord();
 }

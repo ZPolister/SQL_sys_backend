@@ -95,4 +95,13 @@ public class SleepLogServiceImpl extends ServiceImpl<SleepLogMapper, SleepLog>
 
         return this.page(new Page<>(pageNum, pageSize), wrapper);
     }
+
+    @Override
+    public SleepLog getLatestRecord() {
+        LambdaQueryWrapper<SleepLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SleepLog::getAccountId, StpUtil.getLoginIdAsLong())
+                .orderByDesc(SleepLog::getSleepEnd);
+
+        return this.getOne(wrapper);
+    }
 }

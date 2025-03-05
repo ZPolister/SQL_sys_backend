@@ -84,4 +84,11 @@ public class ExerciseLogController {
         Page<ExerciseLog> page = exerciseLogService.getExerciseLogs(startDate, endDate, pageNum, pageSize);
         return ResponseResult.okResult(page);
     }
+
+    @Operation(summary = "获取最新的运动记录")
+    @SaCheckLogin
+    @GetMapping("/latest")
+    public ResponseResult getLatestLog() {
+        return ResponseResult.okResult(exerciseLogService.getLatestLog());
+    }
 }
