@@ -1,6 +1,7 @@
 package cn.polister.infosys.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.polister.infosys.aspect.UpdateTargetExercise;
 import cn.polister.infosys.entity.ExerciseLog;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.entity.dto.ExerciseLogDto;
@@ -50,12 +51,14 @@ public class ExerciseLogController {
     })
     @SaCheckLogin
     @PostMapping
+    @UpdateTargetExercise
     public ResponseResult createLog(@Valid @RequestBody ExerciseLogDto dto) {
         return exerciseLogService.createExerciseLog(dto);
     }
 
     @Operation(summary = "删除运动记录")
     @SaCheckLogin
+    @UpdateTargetExercise
     @DeleteMapping("/{logId}")
     public ResponseResult deleteLog(@PathVariable Long logId) {
         exerciseLogService.deleteExerciseLog(logId);

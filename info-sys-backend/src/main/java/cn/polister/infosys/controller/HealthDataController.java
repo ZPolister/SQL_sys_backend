@@ -3,6 +3,7 @@ package cn.polister.infosys.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.polister.infosys.aspect.UpdateTargetBiometric;
 import cn.polister.infosys.entity.BiometricRecord;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.entity.dto.BiometricRecordDto;
@@ -18,6 +19,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @RestController
@@ -35,25 +37,27 @@ public class HealthDataController {
             @ApiResponse(responseCode = "400", description = "参数校验失败"),
             @ApiResponse(responseCode = "401", description = "需要登录后操作")
     })
+    @UpdateTargetBiometric
     public ResponseResult recordBiometric(
             @Valid @RequestBody BiometricRecordDto recordDto) {
 
         // 校验
-        if (recordDto.getHeightCm() == null || recordDto.getHeightCm() < 50.0) {
+        if (recordDto.getHeightCm() != null && recordDto.getHeightCm() < 50.0) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "身高最小50cm");
         }
-        if (recordDto.getWeightKg() == null || recordDto.getWeightKg() < 2.5) {
-            ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "体重最小2.5kg");
+        if (recordDto.getWeightKg() != null && recordDto.getWeightKg() < 2.5) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "体重最小2.5kg");
         }
-        if (recordDto.getSystolicPressure() == null
-                || recordDto.getSystolicPressure() < 60
-                || recordDto.getSystolicPressure() > 250) {
-            ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "收缩压范围60-250mmHg");
+        if (recordDto.getSystolicPressure() != null &&
+                (recordDto.getSystolicPressure() < 60 || recordDto.getSystolicPressure() > 250)) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "收缩压范围60-250mmHg");
         }
-        if (recordDto.getDiastolicPressure() == null
-                || recordDto.getDiastolicPressure() < 40
-                || recordDto.getDiastolicPressure() > 150) {
-            ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "舒张压范围40-150mmHg");
+        if (recordDto.getDiastolicPressure() != null &&
+                ( recordDto.getDiastolicPressure() < 40 || recordDto.getDiastolicPressure() > 150)) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "舒张压范围40-150mmHg");
+        }
+        if (recordDto.getSystolicPressure() == null || recordDto.getDiastolicPressure() == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "必须同时填入收缩压和舒张压");
         }
         if (recordDto.getSystolicPressure() <= recordDto.getDiastolicPressure()) {
             return ResponseResult.errorResult(
@@ -70,7 +74,7 @@ public class HealthDataController {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "血脂范围0.5-10.0mmol/L");
         }
         if (recordDto.getMeasurementTime() == null) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "测量时间不能为空");
+            recordDto.setMeasurementTime(LocalDateTime.now());
         }
 
         BiometricRecord record = BeanUtil.toBean(recordDto, BiometricRecord.class);
@@ -82,6 +86,7 @@ public class HealthDataController {
 
     @DeleteMapping("/biometric/{id}")
     @Operation(summary = "删除生物特征记录", description = "需要登录，id为对应的记录id")
+    @UpdateTargetBiometric
     public ResponseResult deleteBiometric(@PathVariable Long id) {
         BiometricRecord record = biometricRecordService.getById(id);
 
