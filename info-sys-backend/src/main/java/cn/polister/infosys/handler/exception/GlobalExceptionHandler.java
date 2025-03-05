@@ -1,9 +1,11 @@
 package cn.polister.infosys.handler.exception;
 
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.exception.SystemException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,7 +20,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SystemException.class)
     public ResponseResult systemExceptionHandler(SystemException e) {
         //打印异常信息
-        //log.error("出现了异常！ {}",e);
+        e.printStackTrace();
         //从异常对象中获取提示信息封装返回
         return ResponseResult.errorResult(e.getCode(), e.getMsg());
     }
@@ -50,8 +52,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseResult exceptionHandler(Exception e) {
         //打印异常信息
-        //log.error("出现了异常！{}",e);
+        log.error("出现了异常！{}", e);
+        e.printStackTrace();
         //从异常对象中获取提示信息封装返回
         return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR.getCode(), e.getMessage());
+    }
+
+    @ExceptionHandler(NotLoginException.class)
+    public ResponseResult handleNotLoginException(NotLoginException e, HttpServletResponse response) {
+        log.error(e.toString(), e);
+        response.setStatus(401);
+        return ResponseResult.errorResult(AppHttpCodeEnum.NEED_LOGIN);
     }
 }

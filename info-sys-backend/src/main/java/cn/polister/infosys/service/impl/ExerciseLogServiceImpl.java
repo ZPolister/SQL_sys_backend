@@ -10,12 +10,14 @@ import cn.polister.infosys.exception.SystemException;
 import cn.polister.infosys.mapper.ExerciseLogMapper;
 import cn.polister.infosys.service.ExerciseLogService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 运动记录表(ExerciseLog)表服务实现类
@@ -31,16 +33,16 @@ public class ExerciseLogServiceImpl extends ServiceImpl<ExerciseLogMapper, Exerc
     public ResponseResult createExerciseLog(ExerciseLogDto dto) {
         // 校验
         if (StringUtils.isBlank(dto.getExerciseType())) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID,"运动类型不能为空");
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "运动类型不能为空");
         }
         if (dto.getStartTimestamp() == null || dto.getStartTimestamp().after(new Date())) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID,"开始时间不合法");
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "开始时间不能晚于现在");
         }
         if (dto.getDurationMinutes() == null || dto.getDurationMinutes() < 1) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID,"持续时间至少1分钟");
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "持续时间至少1分钟");
         }
         if (dto.getCaloriesBurned() == null || dto.getCaloriesBurned() < 1) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID,"消耗卡路里至少1大卡");
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "消耗卡路里至少1大卡");
         }
 
         ExerciseLog log = new ExerciseLog();
@@ -77,5 +79,24 @@ public class ExerciseLogServiceImpl extends ServiceImpl<ExerciseLogMapper, Exerc
         }
 
         return this.page(new Page<>(pageNum, pageSize), wrapper);
+    }
+
+    public Double getTotalCaloriesAfter(Long accountId, Date startDate) {
+        LambdaQueryWrapper<ExerciseLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ExerciseLog::getAccountId, accountId)
+                .ge(ExerciseLog::getStartTimestamp, startDate);
+
+        return this.baseMapper.selectList(wrapper)
+                 .stream().mapToDouble(ExerciseLog::getCaloriesBurned).sum();
+    }
+
+    @Override
+    public ExerciseLog getLatestLog() {
+        LambdaQueryWrapper<ExerciseLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ExerciseLog::getAccountId, StpUtil.getLoginIdAsLong())
+                .orderByDesc(ExerciseLog::getCreatedAt)
+                .last("LIMIT 1");
+
+        return this.getOne(wrapper);
     }
 }

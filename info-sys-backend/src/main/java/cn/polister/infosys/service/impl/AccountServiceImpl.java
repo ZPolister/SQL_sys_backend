@@ -20,8 +20,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static cn.polister.infosys.constants.AuthConstants.VERIFY_CODE_KEY;

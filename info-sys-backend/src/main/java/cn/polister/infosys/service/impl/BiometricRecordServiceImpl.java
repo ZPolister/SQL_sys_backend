@@ -37,4 +37,13 @@ public class BiometricRecordServiceImpl extends ServiceImpl<BiometricRecordMappe
 
         return this.page(page, wrapper);
     }
+
+    @Override
+    public BiometricRecord getLatestBiometricRecord(Long accountId) {
+        LambdaQueryWrapper<BiometricRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(BiometricRecord::getAccountId, accountId)
+                .orderByDesc(BiometricRecord::getMeasurementTime)
+                .last("LIMIT 1");
+        return this.getOne(wrapper);
+    }
 }

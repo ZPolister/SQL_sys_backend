@@ -41,5 +41,4 @@ public class HealthGoal  {
 //创建时间
     private Date createdAt;
 
-
 }

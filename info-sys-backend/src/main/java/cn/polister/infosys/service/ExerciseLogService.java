@@ -19,4 +19,6 @@ public interface ExerciseLogService extends IService<ExerciseLog> {
     ResponseResult createExerciseLog(ExerciseLogDto dto);
     void deleteExerciseLog(Long logId);
     Page<ExerciseLog> getExerciseLogs(Date startDate, Date endDate, Integer pageNum, Integer pageSize);
+    Double getTotalCaloriesAfter(Long accountId, Date startDate);
+    ExerciseLog getLatestLog();
 }

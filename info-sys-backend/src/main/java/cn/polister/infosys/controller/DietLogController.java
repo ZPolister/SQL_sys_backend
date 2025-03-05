@@ -59,7 +59,7 @@ public class DietLogController {
             @ApiResponse(responseCode = "401", description = "未登录访问")
     })
     @SaCheckLogin
-    @GetMapping
+    @GetMapping("/page")
     public ResponseResult getLogs(
             @Parameter(description = "开始日期(yyyy-MM-dd)")
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
@@ -74,5 +74,12 @@ public class DietLogController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
         return ResponseResult.okResult(dietLogService.getDietLogs(startDate, endDate, pageNum, pageSize));
+    }
+
+    @Operation(summary = "获取今天的饮食热量")
+    @SaCheckLogin
+    @GetMapping("/hot_today")
+    public ResponseResult getHotToday() {
+        return ResponseResult.okResult(dietLogService.getHotToday());
     }
 }

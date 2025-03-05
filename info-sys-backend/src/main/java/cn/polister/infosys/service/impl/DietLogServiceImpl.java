@@ -2,19 +2,26 @@ package cn.polister.infosys.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.polister.infosys.entity.DietLog;
+import cn.polister.infosys.entity.ExerciseLog;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.entity.dto.DietLogDto;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.mapper.DietLogMapper;
 import cn.polister.infosys.service.DietLogService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 饮食记录表(DietLog)表服务实现类
@@ -45,7 +52,9 @@ public class DietLogServiceImpl extends ServiceImpl<DietLogMapper, DietLog>
         DietLog log = new DietLog();
         BeanUtils.copyProperties(dto, log);
         log.setAccountId(StpUtil.getLoginIdAsLong());
-        log.setCreatedAt(new Date());
+        if (dto.getConsumptionTime() == null) {
+            log.setConsumptionTime(new Date());
+        }
         this.save(log);
         return ResponseResult.okResult(log.getLogId());
     }
@@ -78,5 +87,19 @@ public class DietLogServiceImpl extends ServiceImpl<DietLogMapper, DietLog>
         }
 
         return this.page(new Page<>(pageNum, pageSize), wrapper);
+    }
+
+    @Override
+    public Double getHotToday() {
+        LambdaQueryWrapper<DietLog> wrapper = new LambdaQueryWrapper<>();
+
+        wrapper.ge(DietLog::getConsumptionTime,
+                Date.from(LocalDateTime.of(LocalDate.now(), LocalTime.MIN)
+                        .atZone( ZoneId.systemDefault()).toInstant()));
+
+        return this.getBaseMapper().selectList(wrapper)
+                    .stream().mapToDouble(DietLog::getTotalCalories)
+                    .sum();
+
     }
 }
