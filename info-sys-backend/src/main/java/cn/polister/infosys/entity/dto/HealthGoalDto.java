@@ -1,12 +1,16 @@
 package cn.polister.infosys.entity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 // 2. 目标DTO
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "健康目标请求参数")
 public class HealthGoalDto {
     @Schema(description = "目标类别（WEIGHT_LOSS, BLOOD_SUGAR, BLOOD_LIPID, EXERCISE_CALORIES）", requiredMode = Schema.RequiredMode.REQUIRED)
