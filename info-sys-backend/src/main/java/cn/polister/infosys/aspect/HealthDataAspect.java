@@ -10,6 +10,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 // AOP切面处理数据
 @Aspect
 @Component
@@ -28,6 +30,7 @@ public class HealthDataAspect {
     @AfterReturning("ptB()")
     public void afterBiometricSave(JoinPoint joinPoint) {
         HealthGoal currentGoal = healthGoalService.getCurrentGoal();
+        if (Objects.isNull(currentGoal)) return;
         healthGoalService.updateCurrentValue(StpUtil.getLoginIdAsLong(), currentGoal.getGoalCategory());
     }
 
@@ -35,6 +38,7 @@ public class HealthDataAspect {
     @AfterReturning("ptE()")
     public void afterExerciseSave(JoinPoint joinPoint) {
         HealthGoal currentGoal = healthGoalService.getCurrentGoal();
+        if (Objects.isNull(currentGoal)) return;
         healthGoalService.updateCurrentValue(StpUtil.getLoginIdAsLong(), "EXERCISE_CALORIES");
     }
 
