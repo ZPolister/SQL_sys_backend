@@ -32,8 +32,8 @@ public class Account  {
     private Integer accountType;
 //邮箱
     private String email;
-//手机号码
-    private String phoneNumber;
+//生日
+    private String birthday;
 //账户状态（0-停用，1-启用）
     private Integer accountStatus;
 //创建时间
