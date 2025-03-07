@@ -59,4 +59,10 @@ public class AuthController {
         StpUtil.logout();
         return ResponseResult.okResult();
     }
+
+    @GetMapping("/checkLogin")
+    @Operation(summary = "检查是否登录")
+    public ResponseResult checkIsLogin() {
+        return ResponseResult.okResult(StpUtil.isLogin());
+    }
 }
