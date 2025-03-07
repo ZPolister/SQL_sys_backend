@@ -99,6 +99,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         account.setUsername(dto.getUsername());
         account.setEmail(dto.getEmail());
         account.setPasswordHash(PasswordUtil.encode(dto.getPassword()));
+        account.setBirthday(dto.getBirthday());
         account.setAccountType(0);
         account.setAccountStatus(1);
 
