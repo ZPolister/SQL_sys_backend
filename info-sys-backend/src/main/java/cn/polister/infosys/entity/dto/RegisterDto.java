@@ -24,4 +24,8 @@ public class RegisterDto {
     @Schema(description = "邮箱验证码", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "验证码不能为空")
     private String code;
+
+    @Schema(description = "生日（字符串形式）", example = "2004-01-01", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "请填写生日信息")
+    private String birthday;
 }
