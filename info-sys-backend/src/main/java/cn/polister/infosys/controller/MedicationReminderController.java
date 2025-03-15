@@ -41,7 +41,8 @@ public class MedicationReminderController {
     @PutMapping("/{reminderId}")
     @Operation(summary = "更新服药提醒")
     @SaCheckLogin
-    public ResponseResult<Void> updateReminder(@PathVariable Long reminderId, @RequestBody MedicationReminder reminder) {
+    public ResponseResult<Void> updateReminder(@PathVariable Long reminderId, @RequestBody MedicationReminderDto reminderDto) {
+        MedicationReminder reminder = BeanUtil.toBean(reminderDto, MedicationReminder.class);
         reminder.setReminderId(reminderId);
         reminder.setAccountId(StpUtil.getLoginIdAsLong());
         return medicationReminderService.updateReminder(reminder);
