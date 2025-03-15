@@ -25,7 +25,7 @@ public class SleepLogServiceImpl extends ServiceImpl<SleepLogMapper, SleepLog>
         implements SleepLogService {
 
     @Override
-    public ResponseResult createSleepLog(SleepLogDto dto) {
+    public ResponseResult<Long> createSleepLog(SleepLogDto dto) {
         // 手动参数校验
         Date now = new Date();
 
@@ -66,7 +66,7 @@ public class SleepLogServiceImpl extends ServiceImpl<SleepLogMapper, SleepLog>
     }
 
     @Override
-    public ResponseResult deleteSleepLog(Long logId) {
+    public ResponseResult<Void> deleteSleepLog(Long logId) {
         SleepLog log = this.getById(logId);
         if (log == null) {
             return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST, "睡眠记录不存在");

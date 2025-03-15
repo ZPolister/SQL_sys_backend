@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2025-03-02 20:51:46
  */
 public interface HealthGoalService extends IService<HealthGoal> {
-    ResponseResult createGoal(HealthGoalDto dto);
+    ResponseResult<Long> createGoal(HealthGoalDto dto);
     void updateCurrentValue(Long accountId, String goalCategory);
 
     HealthGoal getCurrentGoal();

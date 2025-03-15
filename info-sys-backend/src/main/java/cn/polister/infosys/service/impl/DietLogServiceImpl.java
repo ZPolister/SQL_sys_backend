@@ -3,6 +3,7 @@ package cn.polister.infosys.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.polister.infosys.entity.DietLog;
 import cn.polister.infosys.entity.ExerciseLog;
+import cn.polister.infosys.entity.PageResult;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.entity.dto.DietLogDto;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
@@ -34,7 +35,7 @@ public class DietLogServiceImpl extends ServiceImpl<DietLogMapper, DietLog>
         implements DietLogService {
 
     @Override
-    public ResponseResult createDietLog(DietLogDto dto) {
+    public ResponseResult<Long> createDietLog(DietLogDto dto) {
         // 参数校验
         if (StringUtils.isBlank(dto.getFoodItem())) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "食物名称不能为空");
@@ -60,7 +61,7 @@ public class DietLogServiceImpl extends ServiceImpl<DietLogMapper, DietLog>
     }
 
     @Override
-    public ResponseResult deleteDietLog(Long logId) {
+    public ResponseResult<Void> deleteDietLog(Long logId) {
         DietLog log = this.getById(logId);
         if (log == null) {
             return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST, "记录不存在");

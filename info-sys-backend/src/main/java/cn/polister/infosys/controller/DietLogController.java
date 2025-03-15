@@ -1,6 +1,8 @@
 package cn.polister.infosys.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.polister.infosys.entity.DietLog;
+import cn.polister.infosys.entity.PageResult;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.entity.dto.DietLogDto;
 import cn.polister.infosys.service.DietLogService;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
-
 @RestController
 @RequestMapping("/diet")
 @Tag(name = "饮食记录管理", description = "饮食数据管理接口")
@@ -30,13 +31,13 @@ public class DietLogController {
     @Operation(summary = "新增饮食记录", description = "需要登录，记录饮食信息")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "创建成功",
-                    content = @Content(schema = @Schema(implementation = ResponseResult.class))),
+                    content = @Content(schema = @Schema(implementation = Long.class))),
             @ApiResponse(responseCode = "400", description = "参数校验失败"),
             @ApiResponse(responseCode = "401", description = "未登录访问")
     })
     @SaCheckLogin
     @PostMapping
-    public ResponseResult createLog(@RequestBody DietLogDto dto) {
+    public ResponseResult<Long> createLog(@RequestBody DietLogDto dto) {
         return dietLogService.createDietLog(dto);
     }
 
@@ -48,19 +49,19 @@ public class DietLogController {
     })
     @SaCheckLogin
     @DeleteMapping("/{logId}")
-    public ResponseResult deleteLog(@PathVariable @Parameter(description = "记录ID", example = "123") Long logId) {
+    public ResponseResult<Void> deleteLog(@PathVariable @Parameter(description = "记录ID", example = "123") Long logId) {
         return dietLogService.deleteDietLog(logId);
     }
 
     @Operation(summary = "分页查询饮食记录", description = "支持按日期范围筛选")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "查询成功",
-                    content = @Content(schema = @Schema(implementation = Page.class))),
+                    content = @Content(schema = @Schema(implementation = PageResult.class))),
             @ApiResponse(responseCode = "401", description = "未登录访问")
     })
     @SaCheckLogin
     @GetMapping("/page")
-    public ResponseResult getLogs(
+    public ResponseResult<Page<DietLog>> getLogs(
             @Parameter(description = "开始日期(yyyy-MM-dd)")
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
 
@@ -79,7 +80,7 @@ public class DietLogController {
     @Operation(summary = "获取今天的饮食热量")
     @SaCheckLogin
     @GetMapping("/hot_today")
-    public ResponseResult getHotToday() {
+    public ResponseResult<Double> getHotToday() {
         return ResponseResult.okResult(dietLogService.getHotToday());
     }
 }

@@ -16,7 +16,7 @@ import java.util.Date;
  * @since 2025-03-02 20:51:15
  */
 public interface ExerciseLogService extends IService<ExerciseLog> {
-    ResponseResult createExerciseLog(ExerciseLogDto dto);
+    ResponseResult<Long> createExerciseLog(ExerciseLogDto dto);
     void deleteExerciseLog(Long logId);
     Page<ExerciseLog> getExerciseLogs(Date startDate, Date endDate, Integer pageNum, Integer pageSize);
     Double getTotalCaloriesAfter(Long accountId, Date startDate);

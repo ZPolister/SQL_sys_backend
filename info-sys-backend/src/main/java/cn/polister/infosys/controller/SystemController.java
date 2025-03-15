@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SystemController {
 
     @GetMapping
-    ResponseResult test() {
+    public ResponseResult<Void> test() {
         return ResponseResult.okResult();
     }
 }

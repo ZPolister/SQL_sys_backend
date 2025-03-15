@@ -30,7 +30,7 @@ public class ExerciseLogServiceImpl extends ServiceImpl<ExerciseLogMapper, Exerc
         implements ExerciseLogService {
 
     @Override
-    public ResponseResult createExerciseLog(ExerciseLogDto dto) {
+    public ResponseResult<Long> createExerciseLog(ExerciseLogDto dto) {
         // 校验
         if (StringUtils.isBlank(dto.getExerciseType())) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "运动类型不能为空");

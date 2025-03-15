@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/health-goals")
 @Tag(name = "健康目标管理", description = "健康目标相关操作")
@@ -26,14 +25,14 @@ public class HealthGoalController {
     @Operation(summary = "创建健康目标")
     @SaCheckLogin
     @PostMapping
-    public ResponseResult createGoal(@RequestBody HealthGoalDto dto) {
+    public ResponseResult<Long> createGoal(@RequestBody HealthGoalDto dto) {
         return healthGoalService.createGoal(dto);
     }
 
     @Operation(summary = "删除目标")
     @SaCheckLogin
     @DeleteMapping("/{goalId}")
-    public ResponseResult deleteGoal(@PathVariable Long goalId) {
+    public ResponseResult<Void> deleteGoal(@PathVariable Long goalId) {
         HealthGoal goal = healthGoalService.getById(goalId);
         if (goal == null || !goal.getAccountId().equals(StpUtil.getLoginIdAsLong())) {
             return ResponseResult.errorResult(AppHttpCodeEnum.NO_OPERATOR_AUTH);
@@ -45,9 +44,7 @@ public class HealthGoalController {
     @Operation(summary = "获取当前目标")
     @SaCheckLogin
     @GetMapping("/current")
-    public ResponseResult getCurrentGoal() {
-
-
+    public ResponseResult<HealthGoal> getCurrentGoal() {
         return ResponseResult.okResult(healthGoalService.getCurrentGoal());
     }
 }

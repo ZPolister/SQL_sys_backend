@@ -16,8 +16,8 @@ import java.util.Date;
  * @since 2025-03-02 20:52:25
  */
 public interface SleepLogService extends IService<SleepLog> {
-    ResponseResult createSleepLog(SleepLogDto dto);
-    ResponseResult deleteSleepLog(Long logId);
+    ResponseResult<Long> createSleepLog(SleepLogDto dto);
+    ResponseResult<Void> deleteSleepLog(Long logId);
     Page<SleepLog> getSleepLogs(Date startDate, Date endDate, Integer pageNum, Integer pageSize);
 
     SleepLog getLatestRecord();

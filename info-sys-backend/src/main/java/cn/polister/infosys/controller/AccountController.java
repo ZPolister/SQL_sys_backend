@@ -1,6 +1,5 @@
 package cn.polister.infosys.controller;
 
-
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
@@ -24,16 +23,17 @@ public class AccountController {
     @GetMapping
     @SaCheckLogin
     @Operation(summary = "获取用户信息")
-    public ResponseResult getUserInfo() {
+    public ResponseResult<UserInfoVo> getUserInfo() {
         return ResponseResult.okResult(
-                BeanUtil.toBean(accountService.getById(StpUtil.getLoginIdAsLong()), UserInfoVo.class)
+                BeanUtil.toBean(accountService.getById(StpUtil.getLoginIdAsLong()), UserInfoVo.class),
+                UserInfoVo.class
         );
     }
 
     @PutMapping
     @SaCheckLogin
     @Operation(summary = "更新用户信息")
-    ResponseResult updateUserInfo(@RequestBody UserInfoDto dto) {
+    public ResponseResult<Void> updateUserInfo(@RequestBody UserInfoDto dto) {
         Account account = BeanUtil.toBean(dto, Account.class);
         account.setAccountId(StpUtil.getLoginIdAsLong());
         accountService.updateById(account);
