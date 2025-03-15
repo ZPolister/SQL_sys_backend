@@ -7,6 +7,8 @@ import cn.polister.infosys.entity.dto.RegisterDto;
 import cn.polister.infosys.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -55,14 +57,16 @@ public ResponseResult<Map<String, String>> login(@RequestBody LoginDto dto) {
 }
 
 @PostMapping("/logout")
-@Operation(summary = "退出登录", description = "退出当前登录")
+@Operation(summary = "退出登录", description = "退出当前用户的登录状态")
+@ApiResponse(responseCode = "200", description = "成功退出登录")
 public ResponseResult<Void> logout() {
     StpUtil.logout();
     return ResponseResult.okResult();
 }
 
 @GetMapping("/checkLogin")
-@Operation(summary = "检查是否登录")
+@Operation(summary = "检查是否登录", description = "检查当前用户是否处于登录状态")
+@ApiResponse(responseCode = "200", description = "成功返回登录状态", content = @Content(schema = @Schema(implementation = Boolean.class)))
 public ResponseResult<Boolean> checkIsLogin() {
     return ResponseResult.okResult(StpUtil.isLogin());
 }

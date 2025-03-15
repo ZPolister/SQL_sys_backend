@@ -77,7 +77,12 @@ public class DietLogController {
         return ResponseResult.okResult(dietLogService.getDietLogs(startDate, endDate, pageNum, pageSize));
     }
 
-    @Operation(summary = "获取今天的饮食热量")
+    @Operation(summary = "获取今天的饮食热量", description = "返回当前用户今天的总饮食热量")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "成功获取今天的饮食热量",
+                    content = @Content(schema = @Schema(implementation = Double.class))),
+            @ApiResponse(responseCode = "401", description = "未登录访问")
+    })
     @SaCheckLogin
     @GetMapping("/hot_today")
     public ResponseResult<Double> getHotToday() {

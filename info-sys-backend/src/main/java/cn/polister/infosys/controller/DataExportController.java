@@ -18,6 +18,7 @@ import cn.polister.infosys.service.SleepLogService;
 import cn.polister.infosys.utils.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
@@ -29,7 +30,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/export")
-@Tag(name = "数据导出", description = "Excel导出数据")
+@Tag(name = "数据导出", description = "Excel导出各类健康数据")
 public class DataExportController {
 
     @Resource
@@ -47,12 +48,9 @@ public class DataExportController {
     @Resource
     private SleepLogService sleepLogService;
 
-    /**
-     * 导出生物特征数据Excel
-     *
-     * @throws IOException 导出失败
-     */
-    @Operation(summary = "导出健康数据")
+    @Operation(summary = "导出健康数据", description = "导出当前用户的生物特征数据到Excel文件")
+    @ApiResponse(responseCode = "200", description = "成功导出数据")
+    @ApiResponse(responseCode = "500", description = "导出失败")
     @GetMapping("/biometric")
     @SaCheckLogin
     public void exportBiometricData() throws IOException {
@@ -64,12 +62,9 @@ public class DataExportController {
         fileUtil.outputExcelFile("健康数据导出", biometricRecordExcels, BiometricRecordExcel.class, "导出数据");
     }
 
-    /**
-     * 导出饮食数据Excel
-     *
-     * @throws IOException 导出失败
-     */
-    @Operation(summary = "导出饮食数据")
+    @Operation(summary = "导出饮食数据", description = "导出当前用户的饮食日志数据到Excel文件")
+    @ApiResponse(responseCode = "200", description = "成功导出数据")
+    @ApiResponse(responseCode = "500", description = "导出失败")
     @GetMapping("/diet")
     @SaCheckLogin
     public void exportDietLogData() throws IOException {
@@ -80,35 +75,29 @@ public class DataExportController {
         fileUtil.outputExcelFile("饮食数据导出", dietLogExcels, DietLogExcel.class, "导出数据");
     }
 
-    /**
-     * 导出运动数据Excel
-     *
-     * @throws IOException 导出失败
-     */
-    @Operation(summary = "导出运动数据")
+    @Operation(summary = "导出运动数据", description = "导出当前用户的运动日志数据到Excel文件")
+    @ApiResponse(responseCode = "200", description = "成功导出数据")
+    @ApiResponse(responseCode = "500", description = "导出失败")
     @GetMapping("/exercise")
     @SaCheckLogin
     public void exportExerciseData() throws IOException {
         LambdaQueryWrapper<ExerciseLog> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ExerciseLog::getAccountId, StpUtil.getLoginIdAsLong());
-        List<ExerciseLogExcel> dietLogExcels = exerciseLogService.getBaseMapper().selectList(queryWrapper).stream()
+        List<ExerciseLogExcel> exerciseLogExcels = exerciseLogService.getBaseMapper().selectList(queryWrapper).stream()
                 .map(x -> BeanUtil.toBean(x, ExerciseLogExcel.class)).toList();
-        fileUtil.outputExcelFile("运动数据导出", dietLogExcels, ExerciseLogExcel.class, "导出数据");
+        fileUtil.outputExcelFile("运动数据导出", exerciseLogExcels, ExerciseLogExcel.class, "导出数据");
     }
 
-    /**
-     * 导出睡眠数据Excel
-     *
-     * @throws IOException 导出失败
-     */
-    @Operation(summary = "导出睡眠数据")
+    @Operation(summary = "导出睡眠数据", description = "导出当前用户的睡眠日志数据到Excel文件")
+    @ApiResponse(responseCode = "200", description = "成功导出数据")
+    @ApiResponse(responseCode = "500", description = "导出失败")
     @GetMapping("/sleep")
     @SaCheckLogin
     public void exportSleepData() throws IOException {
         LambdaQueryWrapper<SleepLog> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SleepLog::getAccountId, StpUtil.getLoginIdAsLong());
-        List<SleepLogExcel> dietLogExcels = sleepLogService.getBaseMapper().selectList(queryWrapper).stream()
+        List<SleepLogExcel> sleepLogExcels = sleepLogService.getBaseMapper().selectList(queryWrapper).stream()
                 .map(x -> BeanUtil.toBean(x, SleepLogExcel.class)).toList();
-        fileUtil.outputExcelFile("睡眠数据导出", dietLogExcels, SleepLogExcel.class, "导出数据");
+        fileUtil.outputExcelFile("睡眠数据导出", sleepLogExcels, SleepLogExcel.class, "导出数据");
     }
 }

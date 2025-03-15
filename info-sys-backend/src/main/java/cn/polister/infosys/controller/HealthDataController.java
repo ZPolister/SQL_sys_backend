@@ -38,7 +38,7 @@ public class HealthDataController {
             @ApiResponse(responseCode = "401", description = "需要登录后操作")
     })
     @UpdateTargetBiometric
-    public ResponseResult recordBiometric(
+    public ResponseResult<Long> recordBiometric(
             @Valid @RequestBody BiometricRecordDto recordDto) {
 
         // 校验
@@ -87,7 +87,7 @@ public class HealthDataController {
     @DeleteMapping("/biometric/{id}")
     @Operation(summary = "删除生物特征记录", description = "需要登录，id为对应的记录id")
     @UpdateTargetBiometric
-    public ResponseResult deleteBiometric(@PathVariable Long id) {
+    public ResponseResult<Void> deleteBiometric(@PathVariable Long id) {
         BiometricRecord record = biometricRecordService.getById(id);
 
         if (record == null) {
@@ -102,14 +102,24 @@ public class HealthDataController {
         return ResponseResult.okResult();
     }
 
-    // 分页获取带日期筛选
-    @Operation(summary = "分页获取生物特征记录", description = "日期为可选")
+    @Operation(summary = "分页获取生物特征记录", description = "获取当前用户的生物特征记录，支持日期范围筛选")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "查询成功"),
+        @ApiResponse(responseCode = "401", description = "未登录访问")
+    })
     @SaCheckLogin
     @GetMapping("/records")
-    public ResponseResult getBiometricRecords(
+    public ResponseResult<Page<BiometricRecord>> getBiometricRecords(
+            @io.swagger.v3.oas.annotations.Parameter(description = "开始日期(yyyy-MM-dd)", example = "2023-01-01")
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
+
+            @io.swagger.v3.oas.annotations.Parameter(description = "结束日期(yyyy-MM-dd)", example = "2023-12-31")
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
+
+            @io.swagger.v3.oas.annotations.Parameter(description = "页码，默认1", example = "1")
             @RequestParam(defaultValue = "1") Integer pageNum,
+
+            @io.swagger.v3.oas.annotations.Parameter(description = "每页数量，默认10", example = "10")
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
         Page<BiometricRecord> page = biometricRecordService.getBiometricRecordsWithDateRange(
@@ -118,10 +128,14 @@ public class HealthDataController {
         return ResponseResult.okResult(page);
     }
 
-    @Operation(summary = "获取最新一次生物特征记录")
+    @Operation(summary = "获取最新一次生物特征记录", description = "获取当前用户最新的一条生物特征记录")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "查询成功"),
+        @ApiResponse(responseCode = "401", description = "未登录访问"),
+    })
     @GetMapping("/latest")
     @SaCheckLogin
-    public ResponseResult getLatestRecord() {
+    public ResponseResult<BiometricRecord> getLatestRecord() {
         return ResponseResult.okResult(biometricRecordService.getLatestBiometricRecord(StpUtil.getLoginIdAsLong()));
     }
 }

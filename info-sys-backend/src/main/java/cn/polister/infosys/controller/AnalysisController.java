@@ -4,6 +4,10 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.polister.infosys.service.AIService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.http.MediaType;
@@ -23,10 +27,21 @@ public class AnalysisController {
 //    @Resource
 //    private HealthAnalysisMapper analysisMapper;
 
-    @Operation(summary = "获取分析数据")
+    @Operation(
+        summary = "获取分析数据",
+        description = "流式获取当前用户的健康数据分析结果，支持实时生成或使用缓存",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "成功返回流式分析数据",
+                content = @Content(mediaType = MediaType.TEXT_EVENT_STREAM_VALUE)
+            )
+        }
+    )
     @SaCheckLogin
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> streamAnalysis(
+            @Parameter(description = "是否刷新缓存，true表示强制重新生成分析", schema = @Schema(type = "boolean", defaultValue = "false"))
             @RequestParam(defaultValue = "false") boolean refresh) {
 
         Long accountId = StpUtil.getLoginIdAsLong();
