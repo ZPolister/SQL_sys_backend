@@ -10,6 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HealthCheckReminderDto {
-    private String reminderContent;
+    private Integer checkFrequencyDays;
     private Date scheduledTime;
+    private String reminderContent;
 }

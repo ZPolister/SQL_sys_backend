@@ -98,7 +98,6 @@ CREATE TABLE `health_check_reminder` (
                                    `reminder_content` VARCHAR(200) NOT NULL COMMENT '提醒内容',
                                    `scheduled_time` DATETIME NOT NULL COMMENT '体检时间',
                                    `completion_status` TINYINT NOT NULL DEFAULT 0 COMMENT '完成状态（0-待处理，1-已完成）',
-                                   `check_frequency_months` INT COMMENT '体检频率（月）',
                                    `check_frequency_days` INT COMMENT '体检频率（天）',
                                    `last_reminder_sent` DATETIME COMMENT '上次提醒发送时间',
                                    `next_reminder_time` DATETIME COMMENT '下次提醒时间',
@@ -134,7 +133,7 @@ CREATE TABLE `medication_reminder` (
                                    `medication_duration` INT NOT NULL COMMENT '服药天数',
                                    `start_time` DATETIME NOT NULL COMMENT '开始服药时间',
                                    `completion_status` TINYINT NOT NULL DEFAULT 0 COMMENT '完成状态（0-待处理，1-已完成）',
-                                   `last_reminder_sent` DATETIME COMMENT '上次提醒发送时间',
+                                   `reminder_time` VARCHAR(100) COMMENT '提醒时间',
                                    `next_reminder_time` DATETIME COMMENT '下次提醒时间',
                                    `reminder_count` INT DEFAULT 0 COMMENT '已发送提醒次数',
                                    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -143,14 +142,3 @@ CREATE TABLE `medication_reminder` (
                                    INDEX `idx_medication_next_reminder` (`next_reminder_time`),
                                    FOREIGN KEY (`account_id`) REFERENCES `account`(`account_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='服药提醒表';
-
--- 服药时间点表
-CREATE TABLE `medication_reminder_time` (
-                                   `time_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '时间ID',
-                                   `reminder_id` BIGINT NOT NULL COMMENT '提醒ID',
-                                   `reminder_time` TIME NOT NULL COMMENT '提醒时间点',
-                                   PRIMARY KEY (`time_id`),
-                                   INDEX `idx_med_reminder_id` (`reminder_id`),
-                                   FOREIGN KEY (`reminder_id`) REFERENCES `medication_reminder`(`reminder_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='服药时间点表';
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='提醒确认记录表';

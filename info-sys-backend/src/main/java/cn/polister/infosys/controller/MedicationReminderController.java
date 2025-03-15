@@ -2,8 +2,10 @@ package cn.polister.infosys.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.polister.infosys.entity.MedicationReminder;
 import cn.polister.infosys.entity.ResponseResult;
+import cn.polister.infosys.entity.dto.MedicationReminderDto;
 import cn.polister.infosys.service.MedicationReminderService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/medication-reminder")
@@ -26,9 +29,13 @@ public class MedicationReminderController {
     @PostMapping
     @Operation(summary = "创建服药提醒")
     @SaCheckLogin
-    public ResponseResult<Void> createReminder(@RequestBody MedicationReminder reminder) {
-        reminder.setAccountId(StpUtil.getLoginIdAsLong());
-        return medicationReminderService.createReminder(reminder);
+    public ResponseResult<Void> createReminder(@RequestBody MedicationReminderDto reminder) {
+        MedicationReminder medicationReminder = BeanUtil.toBean(reminder, MedicationReminder.class);
+        medicationReminder.setAccountId(StpUtil.getLoginIdAsLong());
+        if (Objects.isNull(medicationReminder.getStartTime())) {
+            medicationReminder.setStartTime(new Date());
+        }
+        return medicationReminderService.createReminder(medicationReminder);
     }
 
     @PutMapping("/{reminderId}")

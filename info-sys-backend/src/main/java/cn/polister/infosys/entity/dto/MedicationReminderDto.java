@@ -17,5 +17,6 @@ public class MedicationReminderDto {
     private Integer medicationFrequency;
     private Integer medicationDuration;
     private String reminderContent;
-    private List<Time> reminderTimes;
+    private String reminderTime;
+    private Date startTime;
 }

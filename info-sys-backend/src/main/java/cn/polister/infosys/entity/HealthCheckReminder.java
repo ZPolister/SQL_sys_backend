@@ -27,8 +27,6 @@ public class HealthCheckReminder {
     private Date scheduledTime;
     //完成状态（0-待处理，1-已完成）
     private Integer completionStatus;
-    //体检频率（月）
-    private Integer checkFrequencyMonths;
     //体检频率（天）
     private Integer checkFrequencyDays;
     //上次提醒发送时间

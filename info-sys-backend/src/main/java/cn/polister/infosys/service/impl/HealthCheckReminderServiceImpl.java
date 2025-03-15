@@ -4,6 +4,7 @@ import cn.polister.infosys.entity.HealthCheckReminder;
 import cn.polister.infosys.entity.HealthCheckConfirmation;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
+import cn.polister.infosys.mapper.AccountMapper;
 import cn.polister.infosys.mapper.HealthCheckReminderMapper;
 import cn.polister.infosys.mapper.HealthCheckConfirmationMapper;
 import cn.polister.infosys.service.HealthCheckReminderService;
@@ -35,6 +36,9 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
     private HealthCheckConfirmationMapper healthCheckConfirmationMapper;
 
     @Resource
+    private AccountMapper accountMapper;
+
+    @Resource
     private JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
@@ -44,8 +48,7 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
     @Transactional
     public ResponseResult<Void> createReminder(HealthCheckReminder reminder) {
         // 校验体检频率设置
-        if ((reminder.getCheckFrequencyMonths() == null || reminder.getCheckFrequencyMonths() <= 0)
-            && (reminder.getCheckFrequencyDays() == null || reminder.getCheckFrequencyDays() <= 0)) {
+        if ((reminder.getCheckFrequencyDays() == null || reminder.getCheckFrequencyDays() <= 0)) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "必须设置体检频率");
         }
 
@@ -168,7 +171,6 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
         HealthCheckReminder nextReminder = new HealthCheckReminder();
         nextReminder.setAccountId(currentReminder.getAccountId());
         nextReminder.setReminderContent(currentReminder.getReminderContent());
-        nextReminder.setCheckFrequencyMonths(currentReminder.getCheckFrequencyMonths());
         nextReminder.setCheckFrequencyDays(currentReminder.getCheckFrequencyDays());
 
         // 计算下次体检时间
@@ -176,9 +178,6 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
 
-        if (currentReminder.getCheckFrequencyMonths() != null && currentReminder.getCheckFrequencyMonths() > 0) {
-            nextCheckTime = nextCheckTime.plusMonths(currentReminder.getCheckFrequencyMonths());
-        }
         if (currentReminder.getCheckFrequencyDays() != null && currentReminder.getCheckFrequencyDays() > 0) {
             nextCheckTime = nextCheckTime.plusDays(currentReminder.getCheckFrequencyDays());
         }
@@ -198,18 +197,20 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
         healthCheckConfirmationMapper.insert(nextConfirmation);
     }
 
+    @Value("${confirm-url}")
+    private String confirmUrl;
     private void sendHealthCheckReminder(HealthCheckReminder reminder, HealthCheckConfirmation confirmation, long daysUntilCheck) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromMail);
         message.setTo(getEmailByAccountId(reminder.getAccountId()));
         message.setSubject("健康体检提醒");
-        message.setText("距离您的体检时间还有 " + daysUntilCheck + " 天。\n" +
-                "点此确认: http://yourwebsite.com/confirm?token=" + confirmation.getConfirmationToken());
+        message.setText("距离体检内容:" + reminder.getReminderContent()
+                + "\n体检时间还有 " + daysUntilCheck + " 天。\n" +
+                "点击链接以确认（确认后不再提醒，若设置了周期体检则自动建立下一次提醒）: " + confirmUrl + confirmation.getConfirmationToken());
         mailSender.send(message);
     }
 
     private String getEmailByAccountId(Long accountId) {
-        // 实现获取用户邮箱的逻辑
-        return "user@example.com";
+        return accountMapper.selectById(accountId).getEmail();
     }
 }
