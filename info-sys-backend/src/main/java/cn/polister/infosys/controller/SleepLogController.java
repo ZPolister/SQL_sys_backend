@@ -2,8 +2,10 @@ package cn.polister.infosys.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.polister.infosys.entity.ResponseResult;
+import cn.polister.infosys.entity.SleepLog;
 import cn.polister.infosys.entity.dto.SleepLogDto;
 import cn.polister.infosys.service.SleepLogService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -42,7 +44,7 @@ public class SleepLogController {
     })
     @SaCheckLogin
     @PostMapping
-    public ResponseResult createLog(@RequestBody SleepLogDto dto) {
+    public ResponseResult<Long> createLog(@RequestBody SleepLogDto dto) {
         return sleepLogService.createSleepLog(dto);
     }
 
@@ -58,7 +60,7 @@ public class SleepLogController {
     })
     @SaCheckLogin
     @DeleteMapping("/{logId}")
-    public ResponseResult deleteLog(@PathVariable Long logId) {
+    public ResponseResult<Void> deleteLog(@PathVariable Long logId) {
         return sleepLogService.deleteSleepLog(logId);
     }
 
@@ -78,7 +80,7 @@ public class SleepLogController {
     })
     @SaCheckLogin
     @GetMapping("/page")
-    public ResponseResult getLogs(
+    public ResponseResult<Page<SleepLog>> getLogs(
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
 
@@ -93,7 +95,7 @@ public class SleepLogController {
 
     @SaCheckLogin
     @GetMapping("/latest")
-    public ResponseResult getLatest() {
+    public ResponseResult<SleepLog> getLatest() {
         return ResponseResult.okResult(sleepLogService.getLatestRecord());
     }
 

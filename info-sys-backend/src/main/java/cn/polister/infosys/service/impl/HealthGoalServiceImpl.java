@@ -38,7 +38,7 @@ public class HealthGoalServiceImpl extends ServiceImpl<HealthGoalMapper, HealthG
 
     @Override
     @Transactional
-    public ResponseResult createGoal(HealthGoalDto dto) {
+    public ResponseResult<Long> createGoal(HealthGoalDto dto) {
         Long accountId = StpUtil.getLoginIdAsLong();
 
         // 校验是否存在进行中的同类目标

@@ -52,7 +52,7 @@ public class ExerciseLogController {
     @SaCheckLogin
     @PostMapping
     @UpdateTargetExercise
-    public ResponseResult createLog(@Valid @RequestBody ExerciseLogDto dto) {
+    public ResponseResult<Long> createLog(@Valid @RequestBody ExerciseLogDto dto) {
         return exerciseLogService.createExerciseLog(dto);
     }
 
@@ -60,7 +60,7 @@ public class ExerciseLogController {
     @SaCheckLogin
     @UpdateTargetExercise
     @DeleteMapping("/{logId}")
-    public ResponseResult deleteLog(@PathVariable Long logId) {
+    public ResponseResult<Void> deleteLog(@PathVariable Long logId) {
         exerciseLogService.deleteExerciseLog(logId);
         return ResponseResult.okResult();
     }
@@ -68,7 +68,7 @@ public class ExerciseLogController {
     @Operation(summary = "分页查询运动记录")
     @SaCheckLogin
     @GetMapping
-    public ResponseResult getLogs(
+    public ResponseResult<Page<ExerciseLog>> getLogs(
             @Parameter(description = "开始时间(yyyy-MM-dd)")
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
 
@@ -88,7 +88,7 @@ public class ExerciseLogController {
     @Operation(summary = "获取最新的运动记录")
     @SaCheckLogin
     @GetMapping("/latest")
-    public ResponseResult getLatestLog() {
+    public ResponseResult<ExerciseLog> getLatestLog() {
         return ResponseResult.okResult(exerciseLogService.getLatestLog());
     }
 }
