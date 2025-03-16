@@ -18,6 +18,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/sleep")
@@ -95,8 +97,30 @@ public class SleepLogController {
 
     @SaCheckLogin
     @GetMapping("/latest")
+    @Operation(summary = "获取最新一次睡眠数据")
     public ResponseResult<SleepLog> getLatest() {
         return ResponseResult.okResult(sleepLogService.getLatestRecord());
     }
 
+    @Operation(
+            summary = "获取每日睡眠时长数据",
+            description = "返回指定时间范围内每天的睡眠时长数据，用于生成柱状图，所对应的地址：https://echarts.apache.org/examples/zh/editor.html?c=bar-tick-align",
+            parameters = {
+                    @Parameter(name = "range", description = "时间范围", example = "week",
+                              schema = @Schema(type = "string", allowableValues = {"week", "month", "3months", "6months"}))
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "查询成功",
+                         content = @Content(mediaType = "application/json",
+                         schema = @Schema(example = "{\"dates\":[\"2024-05-01\",\"2024-05-02\"],\"durations\":[7.5,8.2]}"))),
+            @ApiResponse(responseCode = "400", description = "参数无效"),
+            @ApiResponse(responseCode = "401", description = "未登录访问")
+    })
+    @SaCheckLogin
+    @GetMapping("/duration")
+    public ResponseResult<Map<String, Object>> getSleepDurationByDays(
+            @RequestParam(defaultValue = "week") String range) {
+        return sleepLogService.getSleepDurationByDays(range);
+    }
 }

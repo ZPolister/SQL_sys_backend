@@ -19,12 +19,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/diet")
 @Tag(name = "饮食记录管理", description = "饮食数据管理接口")
 public class DietLogController {
-
     @Resource
     private DietLogService dietLogService;
 
@@ -87,5 +87,19 @@ public class DietLogController {
     @GetMapping("/hot_today")
     public ResponseResult<Double> getHotToday() {
         return ResponseResult.okResult(dietLogService.getHotToday());
+    }
+
+    @Operation(summary = "获取每日饮食热量统计", description = "按时间范围获取每日饮食热量统计数据")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "成功获取统计数据"),
+            @ApiResponse(responseCode = "401", description = "未登录访问")
+    })
+    @SaCheckLogin
+    @GetMapping("/daily-calories")
+    public ResponseResult<Map<String, Object>> getDailyCalories(
+            @Parameter(description = "统计范围类型：WEEK(一周)、MONTH(一月)、THREE_MONTHS(三个月)、HALF_YEAR(半年)",
+                    example = "WEEK")
+            @RequestParam String range) {
+        return dietLogService.getDailyCaloriesData(range);
     }
 }

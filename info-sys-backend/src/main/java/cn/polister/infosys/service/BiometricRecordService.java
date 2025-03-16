@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Date;
-
+import java.util.List;
 
 /**
  * 生物特征记录表(BiometricRecord)表服务接口
@@ -16,4 +16,5 @@ import java.util.Date;
 public interface BiometricRecordService extends IService<BiometricRecord> {
     Page<BiometricRecord> getBiometricRecordsWithDateRange(Date startTime, Date endTime, Integer pageNum, Integer pageSize);
     BiometricRecord getLatestBiometricRecord(Long accountId);
+    List<BiometricRecord> getBiometricRecordsInRange(Long accountId, Date startTime, Date endTime);
 }

@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 生物特征记录表(BiometricRecord)表服务实现类
@@ -45,5 +46,23 @@ public class BiometricRecordServiceImpl extends ServiceImpl<BiometricRecordMappe
                 .orderByDesc(BiometricRecord::getMeasurementTime)
                 .last("LIMIT 1");
         return this.getOne(wrapper);
+    }
+
+    @Override
+    public List<BiometricRecord> getBiometricRecordsInRange(Long accountId, Date startTime, Date endTime) {
+        LambdaQueryWrapper<BiometricRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(BiometricRecord::getAccountId, accountId);
+
+        // 构建日期范围查询条件
+        if (startTime != null && endTime != null) {
+            wrapper.between(BiometricRecord::getMeasurementTime, startTime, endTime);
+        } else if (startTime != null) {
+            wrapper.ge(BiometricRecord::getMeasurementTime, startTime);
+        } else if (endTime != null) {
+            wrapper.le(BiometricRecord::getMeasurementTime, endTime);
+        }
+
+        wrapper.orderByAsc(BiometricRecord::getMeasurementTime);
+        return this.list(wrapper);
     }
 }
