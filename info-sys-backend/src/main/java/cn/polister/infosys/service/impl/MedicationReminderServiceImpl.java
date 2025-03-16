@@ -110,7 +110,6 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
                 .le(MedicationReminder::getNextReminderTime, now));
 
         reminders.forEach(r -> {
-            this.sendMedicationReminder(r);
             // 如果提醒次数够了，标记已完成
             if (r.getReminderCount() + 1 >= r.getMedicationFrequency() * r.getMedicationDuration()) {
                 r.setCompletionStatus(1);
@@ -172,8 +171,7 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
         message.setTo(getEmailByAccountId(reminder.getAccountId()));
         message.setSubject("【Dian-Health】服药提醒");
         message.setText("请记得服药：" + reminder.getMedicationName()
-                + "\n用量: " + reminder.getMedicationDosage()
-                + "\n备注：" + reminder.getReminderCount());
+                + "\n用法用量: " + reminder.getMedicationDosage());
         mailSender.send(message);
     }
 
