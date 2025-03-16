@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 饮食记录表(DietLog)表服务接口
@@ -49,4 +50,12 @@ public interface DietLogService extends IService<DietLog> {
      * @return 今日摄入的总热量
      */
     Double getHotToday();
+
+    /**
+     * 获取指定时间范围内每天的饮食热量数据
+     *
+     * @param range 时间范围（"week", "month", "3months", "6months"）
+     * @return 包含日期和热量数据的响应结果
+     */
+    ResponseResult<Map<String, Object>> getDailyCaloriesData(String range);
 }

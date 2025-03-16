@@ -19,12 +19,74 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.util.*;
 
 @RestController
 @RequestMapping("/exercise")
 @Tag(name = "运动记录管理", description = "运动记录相关操作")
 public class ExerciseLogController {
+
+    @Operation(
+            summary = "获取每日运动消耗热量统计",
+            description = "按时间范围获取每日运动消耗热量统计数据，返回格式符合ECharts图表要求"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "成功获取统计数据",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    example = """
+                                    {
+                                      "code": 200,
+                                      "msg": "操作成功",
+                                      "data": {
+                                        "xAxis": ["2024-05-01", "2024-05-02", "2024-05-03", "2024-05-04", "2024-05-05", "2024-05-06", "2024-05-07"],
+                                        "series": [120, 150, 0, 200, 180, 250, 300]
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "无效的时间范围参数",
+                    content = @Content(schema = @Schema(implementation = ResponseResult.class))
+            ),
+            @ApiResponse(responseCode = "401", description = "未登录访问")
+    })
+    @SaCheckLogin
+    @GetMapping("/daily-calories-burned")
+    public ResponseResult<Map<String, Object>> getDailyCaloriesBurned(
+            @Parameter(
+                    description = "统计范围类型：WEEK(一周)、MONTH(一月)、THREE_MONTHS(三个月)、HALF_YEAR(半年)",
+                    schema = @Schema(
+                            type = "string",
+                            allowableValues = {"WEEK", "MONTH", "THREE_MONTHS", "HALF_YEAR"}
+                    ),
+                    example = "WEEK",
+                    required = true
+            )
+            @RequestParam String range) {
+        List<Map<String, Object>> dailyData = exerciseLogService.getDailyCaloriesBurned(range);
+
+        // 转换为ECharts格式
+        List<String> xAxis = new ArrayList<>();
+        List<Integer> series = new ArrayList<>();
+
+        for (Map<String, Object> dayData : dailyData) {
+            xAxis.add((String) dayData.get("date"));
+            series.add((Integer) dayData.get("value"));
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("date", xAxis);
+        result.put("values", series);
+
+        return ResponseResult.okResult(result);
+    }
 
     @Resource
     private ExerciseLogService exerciseLogService;

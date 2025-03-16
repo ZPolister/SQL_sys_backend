@@ -10,7 +10,6 @@ import cn.polister.infosys.exception.SystemException;
 import cn.polister.infosys.mapper.ExerciseLogMapper;
 import cn.polister.infosys.service.ExerciseLogService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,6 +17,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * 运动记录表(ExerciseLog)表服务实现类
@@ -98,5 +102,59 @@ public class ExerciseLogServiceImpl extends ServiceImpl<ExerciseLogMapper, Exerc
                 .last("LIMIT 1");
 
         return this.getOne(wrapper);
+    }
+
+    @Override
+    public List<Map<String, Object>> getDailyCaloriesBurned(String range) {
+        Date endDate = new Date();
+        Date startDate;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(endDate);
+
+        switch (range.toUpperCase()) {
+            case "WEEK":
+                cal.add(Calendar.DAY_OF_YEAR, -6);
+                break;
+            case "MONTH":
+                cal.add(Calendar.MONTH, -1);
+                break;
+            case "THREE_MONTHS":
+                cal.add(Calendar.MONTH, -3);
+                break;
+            case "HALF_YEAR":
+                cal.add(Calendar.MONTH, -6);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid range: " + range);
+        }
+        startDate = cal.getTime();
+
+        LambdaQueryWrapper<ExerciseLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ExerciseLog::getAccountId, StpUtil.getLoginIdAsLong())
+                .between(ExerciseLog::getStartTimestamp, startDate, endDate)
+                .orderByAsc(ExerciseLog::getStartTimestamp);
+
+        List<ExerciseLog> logs = this.list(wrapper);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Map<String, Integer> dailyCalories = new HashMap<>();
+
+        for (ExerciseLog log : logs) {
+            String dateStr = sdf.format(log.getStartTimestamp());
+            dailyCalories.put(dateStr, dailyCalories.getOrDefault(dateStr, 0) + log.getCaloriesBurned());
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        cal.setTime(startDate);
+        while (!cal.getTime().after(endDate)) {
+            String dateStr = sdf.format(cal.getTime());
+            Map<String, Object> dayData = new HashMap<>();
+            dayData.put("date", dateStr);
+            dayData.put("value", dailyCalories.getOrDefault(dateStr, 0));
+            result.add(dayData);
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        return result;
     }
 }

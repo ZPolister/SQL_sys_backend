@@ -84,7 +84,7 @@ public class HealthCheckReminderController {
     @Operation(summary = "获取体检提醒列表", description = "分页获取当前用户的体检提醒列表，可按日期范围筛选")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "查询成功",
-                content = @Content(schema = @Schema(implementation = Page.class))),
+                content = @Content(schema = @Schema(implementation = ResponseResult.class))),
         @ApiResponse(responseCode = "401", description = "未登录访问")
     })
     @SaCheckLogin
