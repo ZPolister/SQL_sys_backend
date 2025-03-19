@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/medication-reminder")
+@RequestMapping("/medication-reminder")
 @Tag(name = "服药提醒管理", description = "服药提醒相关接口")
 public class MedicationReminderController {
 

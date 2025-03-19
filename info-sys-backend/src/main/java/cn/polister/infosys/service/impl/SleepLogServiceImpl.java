@@ -101,7 +101,8 @@ public class SleepLogServiceImpl extends ServiceImpl<SleepLogMapper, SleepLog>
     public SleepLog getLatestRecord() {
         LambdaQueryWrapper<SleepLog> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SleepLog::getAccountId, StpUtil.getLoginIdAsLong())
-                .orderByDesc(SleepLog::getSleepEnd);
+                .orderByDesc(SleepLog::getSleepEnd)
+                .last("LIMIT 1");
 
         return this.getOne(wrapper);
     }
