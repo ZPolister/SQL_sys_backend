@@ -83,8 +83,7 @@ public class HealthCheckReminderController {
     @GetMapping("/list")
     @Operation(summary = "获取体检提醒列表", description = "分页获取当前用户的体检提醒列表，可按日期范围筛选")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "查询成功",
-                content = @Content(schema = @Schema(implementation = ResponseResult.class))),
+        @ApiResponse(responseCode = "200", description = "查询成功"),
         @ApiResponse(responseCode = "401", description = "未登录访问")
     })
     @SaCheckLogin
@@ -103,8 +102,7 @@ public class HealthCheckReminderController {
     @GetMapping
     @Operation(summary = "获取最近一次体检提醒信息", description = "获取当前用户最近一次未完成的体检提醒")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "查询成功",
-                content = @Content(schema = @Schema(implementation = HealthCheckReminderDto.class))),
+        @ApiResponse(responseCode = "200", description = "查询成功"),
         @ApiResponse(responseCode = "401", description = "未登录访问")
     })
     @SaCheckLogin
