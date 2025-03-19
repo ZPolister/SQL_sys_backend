@@ -136,10 +136,7 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
         Collections.sort(scheduleTimes);
 
         // 转换当前Date为LocalDateTime
-        Date currentDate = reminder.getNextReminderTime();
-        if (Objects.isNull(currentDate)) {
-            currentDate = new Date();
-        }
+        Date currentDate = new Date();
         LocalDateTime currentDateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         LocalTime currentTime = currentDateTime.toLocalTime();
 

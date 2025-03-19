@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/api/health-check-reminder")
+@RequestMapping("/health-check-reminder")
 @Tag(name = "体检提醒管理", description = "体检提醒相关接口")
 public class HealthCheckReminderController {
 

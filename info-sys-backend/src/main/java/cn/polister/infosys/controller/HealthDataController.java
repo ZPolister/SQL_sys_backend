@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @Tag(name = "体征数据管理", description = "体征数据相关接口")
-@RequestMapping("/api/health")
+@RequestMapping("/health")
 public class HealthDataController {
 
     @Resource
