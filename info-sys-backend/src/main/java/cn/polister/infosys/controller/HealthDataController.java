@@ -132,7 +132,6 @@ public class HealthDataController {
         Page<BiometricRecord> page = biometricRecordService.getBiometricRecordsWithDateRange(
                 startTime, endTime, pageNum, pageSize
         );
-
         // 转换为VO并计算额外信息
         Page<BiometricRecordVo> voPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
         voPage.setRecords(page.getRecords().stream().map(this::convertToVo).toList());

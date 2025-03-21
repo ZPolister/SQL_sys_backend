@@ -9,6 +9,7 @@ import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.exception.SystemException;
 import cn.polister.infosys.mapper.ExerciseLogMapper;
 import cn.polister.infosys.service.ExerciseLogService;
+import cn.polister.infosys.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -75,10 +76,12 @@ public class ExerciseLogServiceImpl extends ServiceImpl<ExerciseLogMapper, Exerc
                 .orderByDesc(ExerciseLog::getStartTimestamp);
 
         if (startDate != null && endDate != null) {
+            DateUtil.handleDate(endDate);
             wrapper.between(ExerciseLog::getStartTimestamp, startDate, endDate);
         } else if (startDate != null) {
             wrapper.ge(ExerciseLog::getStartTimestamp, startDate);
         } else if (endDate != null) {
+            DateUtil.handleDate(endDate);
             wrapper.le(ExerciseLog::getStartTimestamp, endDate);
         }
 
