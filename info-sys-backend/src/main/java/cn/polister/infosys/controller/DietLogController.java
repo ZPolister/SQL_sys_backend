@@ -55,8 +55,7 @@ public class DietLogController {
 
     @Operation(summary = "分页查询饮食记录", description = "支持按日期范围筛选")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "查询成功",
-                    content = @Content(schema = @Schema(implementation = PageResult.class))),
+            @ApiResponse(responseCode = "200", description = "查询成功"),
             @ApiResponse(responseCode = "401", description = "未登录访问")
     })
     @SaCheckLogin
