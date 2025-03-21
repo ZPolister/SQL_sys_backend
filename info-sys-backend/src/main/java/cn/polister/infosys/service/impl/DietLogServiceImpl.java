@@ -24,6 +24,8 @@ import java.time.ZoneId;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static cn.polister.infosys.utils.DateUtil.handleDate;
+
 /**
  * 饮食记录表(DietLog)表服务实现类
  *
@@ -80,10 +82,14 @@ public class DietLogServiceImpl extends ServiceImpl<DietLogMapper, DietLog>
                 .orderByDesc(DietLog::getConsumptionTime);
 
         if (startDate != null && endDate != null) {
+            // 调整 endDate 到当天的最后一刻
+            endDate = handleDate(endDate);
             wrapper.between(DietLog::getConsumptionTime, startDate, endDate);
         } else if (startDate != null) {
             wrapper.ge(DietLog::getConsumptionTime, startDate);
         } else if (endDate != null) {
+            // 调整 endDate 到当天的最后一刻
+            endDate = handleDate(endDate);
             wrapper.le(DietLog::getConsumptionTime, endDate);
         }
 
@@ -96,11 +102,11 @@ public class DietLogServiceImpl extends ServiceImpl<DietLogMapper, DietLog>
 
         wrapper.ge(DietLog::getConsumptionTime,
                 Date.from(LocalDateTime.of(LocalDate.now(), LocalTime.MIN)
-                        .atZone( ZoneId.systemDefault()).toInstant()));
+                        .atZone(ZoneId.systemDefault()).toInstant()));
 
         return this.getBaseMapper().selectList(wrapper)
-                    .stream().mapToDouble(DietLog::getTotalCalories)
-                    .sum();
+                .stream().mapToDouble(DietLog::getTotalCalories)
+                .sum();
     }
 
     @Override

@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.polister.infosys.entity.BiometricRecord;
 import cn.polister.infosys.mapper.BiometricRecordMapper;
 import cn.polister.infosys.service.BiometricRecordService;
+import cn.polister.infosys.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,10 +30,12 @@ public class BiometricRecordServiceImpl extends ServiceImpl<BiometricRecordMappe
 
         // 构建日期范围查询条件
         if (startTime != null && endTime != null) {
+            DateUtil.handleDate(endTime);
             wrapper.between(BiometricRecord::getMeasurementTime, startTime, endTime);
         } else if (startTime != null) {
             wrapper.ge(BiometricRecord::getMeasurementTime, startTime);
         } else if (endTime != null) {
+            DateUtil.handleDate(endTime);
             wrapper.le(BiometricRecord::getMeasurementTime, endTime);
         }
 

@@ -7,6 +7,7 @@ import cn.polister.infosys.entity.dto.SleepLogDto;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.mapper.SleepLogMapper;
 import cn.polister.infosys.service.SleepLogService;
+import cn.polister.infosys.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -87,10 +88,12 @@ public class SleepLogServiceImpl extends ServiceImpl<SleepLogMapper, SleepLog>
 
         // 日期范围筛选（基于入睡时间）
         if (startDate != null && endDate != null) {
+            DateUtil.handleDate(endDate);
             wrapper.between(SleepLog::getSleepStart, startDate, endDate);
         } else if (startDate != null) {
             wrapper.ge(SleepLog::getSleepStart, startDate);
         } else if (endDate != null) {
+            DateUtil.handleDate(endDate);
             wrapper.le(SleepLog::getSleepStart, endDate);
         }
 

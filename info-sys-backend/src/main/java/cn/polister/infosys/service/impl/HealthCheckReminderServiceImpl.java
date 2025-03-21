@@ -8,6 +8,7 @@ import cn.polister.infosys.mapper.AccountMapper;
 import cn.polister.infosys.mapper.HealthCheckReminderMapper;
 import cn.polister.infosys.mapper.HealthCheckConfirmationMapper;
 import cn.polister.infosys.service.HealthCheckReminderService;
+import cn.polister.infosys.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -92,6 +93,7 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
             wrapper.ge("scheduled_time", startDate);
         }
         if (endDate != null) {
+            DateUtil.handleDate(endDate);
             wrapper.le("scheduled_time", endDate);
         }
         wrapper.orderByAsc("scheduled_time");

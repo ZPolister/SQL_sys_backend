@@ -7,6 +7,7 @@ import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.mapper.AccountMapper;
 import cn.polister.infosys.mapper.MedicationReminderMapper;
 import cn.polister.infosys.service.MedicationReminderService;
+import cn.polister.infosys.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -93,6 +94,7 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
             wrapper.ge("start_time", startDate);
         }
         if (endDate != null) {
+            DateUtil.handleDate(endDate);
             wrapper.le("start_time", endDate);
         }
         wrapper.orderByAsc("start_time");
