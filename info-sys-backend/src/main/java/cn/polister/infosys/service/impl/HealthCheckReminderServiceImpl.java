@@ -93,7 +93,7 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
             wrapper.ge("scheduled_time", startDate);
         }
         if (endDate != null) {
-            DateUtil.handleDate(endDate);
+            endDate = DateUtil.handleDate(endDate);
             wrapper.le("scheduled_time", endDate);
         }
         wrapper.orderByAsc("scheduled_time");

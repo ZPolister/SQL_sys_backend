@@ -76,12 +76,12 @@ public class ExerciseLogServiceImpl extends ServiceImpl<ExerciseLogMapper, Exerc
                 .orderByDesc(ExerciseLog::getStartTimestamp);
 
         if (startDate != null && endDate != null) {
-            DateUtil.handleDate(endDate);
+            endDate = DateUtil.handleDate(endDate);
             wrapper.between(ExerciseLog::getStartTimestamp, startDate, endDate);
         } else if (startDate != null) {
             wrapper.ge(ExerciseLog::getStartTimestamp, startDate);
         } else if (endDate != null) {
-            DateUtil.handleDate(endDate);
+            endDate = DateUtil.handleDate(endDate);
             wrapper.le(ExerciseLog::getStartTimestamp, endDate);
         }
 

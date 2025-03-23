@@ -30,12 +30,12 @@ public class BiometricRecordServiceImpl extends ServiceImpl<BiometricRecordMappe
 
         // 构建日期范围查询条件
         if (startTime != null && endTime != null) {
-            DateUtil.handleDate(endTime);
+            endTime = DateUtil.handleDate(endTime);
             wrapper.between(BiometricRecord::getMeasurementTime, startTime, endTime);
         } else if (startTime != null) {
             wrapper.ge(BiometricRecord::getMeasurementTime, startTime);
         } else if (endTime != null) {
-            DateUtil.handleDate(endTime);
+            endTime = DateUtil.handleDate(endTime);
             wrapper.le(BiometricRecord::getMeasurementTime, endTime);
         }
 
