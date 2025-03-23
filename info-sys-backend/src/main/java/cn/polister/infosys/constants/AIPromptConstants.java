@@ -22,14 +22,14 @@ public class AIPromptConstants {
            3. 提出一个目标建议，要求：
            - 在减重（WEIGHT_LOSS）、运动热量（EXERCISE_CALORIES）、血糖控制（BLOOD_SUGAR）、血脂控制（BLOOD_LIPID）四个方面四选一
            - 给出理由、目标数值、期望达成日期
-           - 最后从建议提取一个json结果，严格按照```{json结果}```格式附加到结果后面
+           - 最后从建议提取一个json结果，严格按照<goal>{json结果}</goal>格式附加到结果后面
            - 示例格式：
-           ```
+           <goal>
            {
                "goalCategory": "WEIGHT_LOSS|BLOOD_SUGAR|BLOOD_LIPID|EXERCISE_CALORIES",
                "targetValue": 目标数值,
                "targetDate": "期望达成日期（按照"yyyy-MM-dd"格式字符串输出，如“2025-03-06”）"
            }
-           ```
+           </goal>
         """;
 }
