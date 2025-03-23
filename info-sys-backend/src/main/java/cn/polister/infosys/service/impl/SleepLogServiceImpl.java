@@ -88,12 +88,12 @@ public class SleepLogServiceImpl extends ServiceImpl<SleepLogMapper, SleepLog>
 
         // 日期范围筛选（基于入睡时间）
         if (startDate != null && endDate != null) {
-            DateUtil.handleDate(endDate);
+            endDate = DateUtil.handleDate(endDate);
             wrapper.between(SleepLog::getSleepStart, startDate, endDate);
         } else if (startDate != null) {
             wrapper.ge(SleepLog::getSleepStart, startDate);
         } else if (endDate != null) {
-            DateUtil.handleDate(endDate);
+            endDate = DateUtil.handleDate(endDate);
             wrapper.le(SleepLog::getSleepStart, endDate);
         }
 

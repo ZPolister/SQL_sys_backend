@@ -94,7 +94,7 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
             wrapper.ge("start_time", startDate);
         }
         if (endDate != null) {
-            DateUtil.handleDate(endDate);
+            endDate = DateUtil.handleDate(endDate);
             wrapper.le("start_time", endDate);
         }
         wrapper.orderByAsc("start_time");
