@@ -41,12 +41,14 @@ public class HealthGoalServiceImpl extends ServiceImpl<HealthGoalMapper, HealthG
     public ResponseResult<Long> createGoal(HealthGoalDto dto) {
         Long accountId = StpUtil.getLoginIdAsLong();
 
-        // 校验是否存在进行中的同类目标
+        // 校验是否存在进行中的目标
         LambdaQueryWrapper<HealthGoal> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(HealthGoal::getAccountId, accountId)
                 .eq(HealthGoal::getGoalStatus, GoalStatus.IN_PROGRESS.code);
         if (this.count(wrapper) > 0) {
-            return ResponseResult.errorResult(AppHttpCodeEnum.PARAMETER_INVALID, "已有进行中的目标");
+            HealthGoal healthGoal = this.getOne(wrapper);
+            healthGoal.setGoalStatus(GoalStatus.FAILED.code);
+            this.updateById(healthGoal);
         }
 
         // 创建新目标
