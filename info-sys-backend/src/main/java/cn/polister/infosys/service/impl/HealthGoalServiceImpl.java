@@ -47,7 +47,7 @@ public class HealthGoalServiceImpl extends ServiceImpl<HealthGoalMapper, HealthG
                 .eq(HealthGoal::getGoalStatus, GoalStatus.IN_PROGRESS.code);
         if (this.count(wrapper) > 0) {
             HealthGoal healthGoal = this.getOne(wrapper);
-            healthGoal.setGoalStatus(GoalStatus.ACHIEVED.code);
+            healthGoal.setGoalStatus(GoalStatus.FAILED.code);
             this.save(healthGoal);
         }
 
