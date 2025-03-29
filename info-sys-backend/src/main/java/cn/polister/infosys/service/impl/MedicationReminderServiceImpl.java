@@ -61,7 +61,6 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
         reminder.setNextReminderTime(this.calculateNextReminderTime(reminder));
         this.save(reminder);
 
-
         return ResponseResult.okResult();
     }
 
@@ -140,7 +139,6 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
         LocalDateTime currentDateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         LocalTime currentTime = currentDateTime.toLocalTime();
 
-
         // 查找下一个时间点
         LocalTime nextTime = null;
         for (LocalTime t : scheduleTimes) {
@@ -174,5 +172,27 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
 
     private String getEmailByAccountId(Long accountId) {
         return accountMapper.selectById(accountId).getEmail();
+    }
+
+    @Override
+    public List<MedicationReminder> getNextReminders(Long accountId) {
+        // 获取当前用户未完成的提醒
+        LambdaQueryWrapper<MedicationReminder> wrapper = new LambdaQueryWrapper<MedicationReminder>()
+                .eq(MedicationReminder::getAccountId, accountId)
+                .eq(MedicationReminder::getCompletionStatus, 0)
+                .orderByAsc(MedicationReminder::getNextReminderTime);
+
+        List<MedicationReminder> reminders = this.list(wrapper);
+        if (reminders.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 获取最早的下次提醒时间
+        Date earliestTime = reminders.get(0).getNextReminderTime();
+
+        // 返回所有具有相同最早提醒时间的提醒
+        return reminders.stream()
+                .filter(r -> r.getNextReminderTime().equals(earliestTime))
+                .toList();
     }
 }

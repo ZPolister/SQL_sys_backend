@@ -65,4 +65,11 @@ public class MedicationReminderController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
         return ResponseResult.okResult(medicationReminderService.getReminderList(startDate, endDate, pageNum, pageSize));
     }
+
+    @GetMapping("/next")
+    @Operation(summary = "获取下次最近服药时间的提醒")
+    @SaCheckLogin
+    public ResponseResult<List<MedicationReminder>> getNextReminders() {
+        return ResponseResult.okResult(medicationReminderService.getNextReminders(StpUtil.getLoginIdAsLong()));
+    }
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 服药提醒表(MedicationReminder)表服务接口
@@ -16,4 +17,5 @@ public interface MedicationReminderService extends IService<MedicationReminder> 
     ResponseResult<Void> deleteReminder(Long reminderId);
     Page<MedicationReminder> getReminderList(Date startDate, Date endDate, Integer pageNum, Integer pageSize);
     void processReminders();
+    List<MedicationReminder> getNextReminders(Long accountId);
 }
