@@ -6,6 +6,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.polister.infosys.entity.MedicationReminder;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.entity.dto.MedicationReminderDto;
+import cn.polister.infosys.entity.vo.MedicationReminderVo;
 import cn.polister.infosys.service.MedicationReminderService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -36,6 +38,21 @@ public class MedicationReminderController {
             medicationReminder.setStartTime(new Date());
         }
         return medicationReminderService.createReminder(medicationReminder);
+    }
+
+    @PostMapping("/batch")
+    @Operation(summary = "批量创建服药提醒")
+    @SaCheckLogin
+    public ResponseResult<Void> createReminders(@RequestBody List<MedicationReminderDto> reminders) {
+            for (MedicationReminderDto reminderDto : reminders) {
+            MedicationReminder medicationReminder = BeanUtil.toBean(reminderDto, MedicationReminder.class);
+            medicationReminder.setAccountId(StpUtil.getLoginIdAsLong());
+            if (Objects.isNull(medicationReminder.getStartTime())) {
+                medicationReminder.setStartTime(new Date());
+            }
+            medicationReminderService.createReminder(medicationReminder);
+        }
+        return ResponseResult.okResult(null);
     }
 
     @PutMapping("/{reminderId}")
@@ -65,4 +82,19 @@ public class MedicationReminderController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
         return ResponseResult.okResult(medicationReminderService.getReminderList(startDate, endDate, pageNum, pageSize));
     }
+
+    @GetMapping("/next")
+    @Operation(summary = "获取下次最近服药时间的提醒")
+    @SaCheckLogin
+    public ResponseResult<List<MedicationReminder>> getNextReminders() {
+        return ResponseResult.okResult(medicationReminderService.getNextReminders(StpUtil.getLoginIdAsLong()));
+    }
+
+    @PostMapping("/png")
+    @Operation(summary = "通过图片识别服药信息")
+    @SaCheckLogin
+    public ResponseResult<List<MedicationReminderVo>> getInfoByPng(@RequestParam MultipartFile file) {
+        return ResponseResult.okResult(medicationReminderService.getInfoByPng(file));
+    }
+
 }
