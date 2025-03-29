@@ -3,9 +3,12 @@ package cn.polister.infosys.service.impl;
 import cn.hutool.json.JSONUtil;
 import cn.polister.infosys.entity.MedicationReminder;
 import cn.polister.infosys.entity.ResponseResult;
+import cn.polister.infosys.entity.dto.MedicationReminderDto;
+import cn.polister.infosys.entity.vo.MedicationReminderVo;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.mapper.AccountMapper;
 import cn.polister.infosys.mapper.MedicationReminderMapper;
+import cn.polister.infosys.service.AIService;
 import cn.polister.infosys.service.MedicationReminderService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -19,6 +22,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -35,6 +39,9 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
 
     @Resource
     private JavaMailSender mailSender;
+
+    @Resource
+    private AIService aiService;
 
     @Value("${spring.mail.username}")
     private String fromMail;
@@ -194,5 +201,10 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
         return reminders.stream()
                 .filter(r -> r.getNextReminderTime().equals(earliestTime))
                 .toList();
+    }
+
+    @Override
+    public List<MedicationReminderVo> getInfoByPng(MultipartFile file) {
+        return aiService.getMedicationReminderByPng(file);
     }
 }

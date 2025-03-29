@@ -6,6 +6,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.polister.infosys.entity.MedicationReminder;
 import cn.polister.infosys.entity.ResponseResult;
 import cn.polister.infosys.entity.dto.MedicationReminderDto;
+import cn.polister.infosys.entity.vo.MedicationReminderVo;
 import cn.polister.infosys.service.MedicationReminderService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -72,4 +74,12 @@ public class MedicationReminderController {
     public ResponseResult<List<MedicationReminder>> getNextReminders() {
         return ResponseResult.okResult(medicationReminderService.getNextReminders(StpUtil.getLoginIdAsLong()));
     }
+
+    @PostMapping("/png")
+    @Operation(summary = "通过图片识别服药信息")
+    @SaCheckLogin
+    public ResponseResult<List<MedicationReminderVo>> getInfoByPng(@RequestParam MultipartFile file) {
+        return ResponseResult.okResult(medicationReminderService.getInfoByPng(file));
+    }
+
 }
