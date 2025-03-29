@@ -103,7 +103,7 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
             endDate = DateUtil.handleDate(endDate);
             wrapper.le("start_time", endDate);
         }
-        wrapper.orderByAsc("start_time");
+        wrapper.orderByDesc("start_time");
 
         return this.page(new Page<>(pageNum, pageSize), wrapper);
     }

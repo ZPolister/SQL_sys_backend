@@ -40,6 +40,21 @@ public class MedicationReminderController {
         return medicationReminderService.createReminder(medicationReminder);
     }
 
+    @PostMapping("/batch")
+    @Operation(summary = "批量创建服药提醒")
+    @SaCheckLogin
+    public ResponseResult<Void> createReminders(@RequestBody List<MedicationReminderDto> reminders) {
+            for (MedicationReminderDto reminderDto : reminders) {
+            MedicationReminder medicationReminder = BeanUtil.toBean(reminderDto, MedicationReminder.class);
+            medicationReminder.setAccountId(StpUtil.getLoginIdAsLong());
+            if (Objects.isNull(medicationReminder.getStartTime())) {
+                medicationReminder.setStartTime(new Date());
+            }
+            medicationReminderService.createReminder(medicationReminder);
+        }
+        return ResponseResult.okResult(null);
+    }
+
     @PutMapping("/{reminderId}")
     @Operation(summary = "更新服药提醒")
     @SaCheckLogin
