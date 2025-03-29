@@ -3,9 +3,12 @@ package cn.polister.infosys.service.impl;
 import cn.hutool.json.JSONUtil;
 import cn.polister.infosys.entity.MedicationReminder;
 import cn.polister.infosys.entity.ResponseResult;
+import cn.polister.infosys.entity.dto.MedicationReminderDto;
+import cn.polister.infosys.entity.vo.MedicationReminderVo;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.mapper.AccountMapper;
 import cn.polister.infosys.mapper.MedicationReminderMapper;
+import cn.polister.infosys.service.AIService;
 import cn.polister.infosys.service.MedicationReminderService;
 import cn.polister.infosys.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -20,6 +23,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -36,6 +40,9 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
 
     @Resource
     private JavaMailSender mailSender;
+
+    @Resource
+    private AIService aiService;
 
     @Value("${spring.mail.username}")
     private String fromMail;
@@ -61,7 +68,6 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
         reminder.setReminderCount(0);
         reminder.setNextReminderTime(this.calculateNextReminderTime(reminder));
         this.save(reminder);
-
 
         return ResponseResult.okResult();
     }
@@ -142,7 +148,6 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
         LocalDateTime currentDateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         LocalTime currentTime = currentDateTime.toLocalTime();
 
-
         // 查找下一个时间点
         LocalTime nextTime = null;
         for (LocalTime t : scheduleTimes) {
@@ -176,5 +181,32 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
 
     private String getEmailByAccountId(Long accountId) {
         return accountMapper.selectById(accountId).getEmail();
+    }
+
+    @Override
+    public List<MedicationReminder> getNextReminders(Long accountId) {
+        // 获取当前用户未完成的提醒
+        LambdaQueryWrapper<MedicationReminder> wrapper = new LambdaQueryWrapper<MedicationReminder>()
+                .eq(MedicationReminder::getAccountId, accountId)
+                .eq(MedicationReminder::getCompletionStatus, 0)
+                .orderByAsc(MedicationReminder::getNextReminderTime);
+
+        List<MedicationReminder> reminders = this.list(wrapper);
+        if (reminders.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 获取最早的下次提醒时间
+        Date earliestTime = reminders.get(0).getNextReminderTime();
+
+        // 返回所有具有相同最早提醒时间的提醒
+        return reminders.stream()
+                .filter(r -> r.getNextReminderTime().equals(earliestTime))
+                .toList();
+    }
+
+    @Override
+    public List<MedicationReminderVo> getInfoByPng(MultipartFile file) {
+        return aiService.getMedicationReminderByPng(file);
     }
 }

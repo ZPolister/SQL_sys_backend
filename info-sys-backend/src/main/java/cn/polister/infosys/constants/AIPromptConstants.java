@@ -1,6 +1,35 @@
 package cn.polister.infosys.constants;
 
+import org.springframework.ai.chat.messages.Message;
+
+import java.util.List;
+
 public class AIPromptConstants {
+    public static final String REMINDER_PROMPT = """
+            你是图像识别信息提取与药学领域专家，提取出图片中的处方信息，包括以下内容:
+              - 药品名称
+              - 药品用法用量
+              - 每天服用次数
+              - 药品需要服用天数
+            使用JSON返回，按照以下的JSON格式：
+            [
+                {
+                    "medicationName": "药品1名称",
+                    "medicationDosage": "药品1用法用量",
+                    "medicationFrequency": 0（每天服用次数）,
+                    "medicationDuration": 0（药品服用天数）,
+                },
+                {
+                    "medicationName": "药品2名称",
+                    "medicationDosage": "药品2用法用量",
+                    "medicationFrequency": 0（每天服用次数）,
+                    "medicationDuration": 0（药品服用天数）,
+                },
+                ......
+            ]
+            注意，你只能返回JSON格式的列表，不允许其他内容；如果无法识别其中有处方内容，返回空列表。
+            """;
+
     public static String ANALYSIS_PROMPT = """
         现在是{nowDate}，作为健康管理专家，请根据以下用户数据进行分析，输出请使用普通文段格式，而不是Markdown：
         

@@ -5,6 +5,8 @@ import cn.hutool.json.JSONUtil;
 import cn.polister.infosys.constants.AIPromptConstants;
 import cn.polister.infosys.entity.*;
 import cn.polister.infosys.entity.dto.HealthGoalDto;
+import cn.polister.infosys.entity.dto.MedicationReminderDto;
+import cn.polister.infosys.entity.vo.MedicationReminderVo;
 import cn.polister.infosys.enums.AppHttpCodeEnum;
 import cn.polister.infosys.exception.SystemException;
 import cn.polister.infosys.mapper.BiometricRecordMapper;
@@ -15,24 +17,36 @@ import cn.polister.infosys.service.AIService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.Media;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.SynchronousSink;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 public class AIServiceImpl implements AIService {
     @Resource
     private StreamingChatModel streamingChatModel;
+    @Resource
+    private ChatModel chatModel;
     @Resource
     private BiometricRecordMapper biometricMapper;
     @Resource
@@ -60,11 +74,42 @@ public class AIServiceImpl implements AIService {
                 .replace("{diets}", formatDiets(context.diets()))
                 .replace("{sleeps}", formatSleeps(context.sleeps())));
 
-
         // 流式响应处理
         return streamingChatModel.stream(prompt)
                 .map(response -> response.getResult().getOutput().getText());
 //                .transform(this::extractGoals); // 提取目标建议
+    }
+
+    @Override
+    public List<MedicationReminderVo> getMedicationReminderByPng(MultipartFile pngFile) {
+        var userMessage = new UserMessage(AIPromptConstants.REMINDER_PROMPT,
+                new Media(MimeTypeUtils.IMAGE_PNG, pngFile.getResource()));
+
+        ChatResponse response = chatModel.call(new Prompt(userMessage,
+                OpenAiChatOptions.builder()
+                        .model("Qwen/Qwen2.5-VL-32B-Instruct")
+                        .build()));
+
+        String aiResponse = response.getResult().getOutput().getText();
+
+        // 使用正则表达式匹配```json和```之间的内容
+        Pattern pattern = Pattern.compile("(?<=```json)([\\s\\S]*?)(?=```)");
+        Matcher matcher = pattern.matcher(aiResponse);
+
+        if (matcher.find()) {
+            String jsonContent = matcher.group(1).trim();
+            return JSONUtil.toList(jsonContent, MedicationReminderVo.class);
+        }
+
+        pattern = Pattern.compile("(?<=```)([\\s\\S]*?)(?=```)");
+        matcher = pattern.matcher(aiResponse);
+        if (matcher.find()) {
+            String jsonContent = matcher.group(1).trim();
+            return JSONUtil.toList(jsonContent, MedicationReminderVo.class);
+        }
+
+        // 如果没有找到匹配的JSON格式，则尝试直接解析整个响应
+        return JSONUtil.toList(aiResponse, MedicationReminderVo.class);
     }
 
     // 结构化目标提取
@@ -163,4 +208,3 @@ public class AIServiceImpl implements AIService {
                 .collect(Collectors.joining("\n"));
     }
 }
-
