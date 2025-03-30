@@ -110,9 +110,9 @@ public class HealthGoalServiceImpl extends ServiceImpl<HealthGoalMapper, HealthG
         }
 
         // 检查是否达成目标
-        if (goal.getGoalCategory().equals("EXERCISE_CALORIES")
-                && goal.getCurrentValue() >= goal.getTargetValue()) {
-            goal.setGoalStatus(GoalStatus.ACHIEVED.code);
+        if (goal.getGoalCategory().equals("EXERCISE_CALORIES")) {
+            if (goal.getCurrentValue() >= goal.getTargetValue())
+                goal.setGoalStatus(GoalStatus.ACHIEVED.code);
         } else if (goal.getCurrentValue() <= goal.getTargetValue()) {
             goal.setGoalStatus(GoalStatus.ACHIEVED.code);
         }else {
@@ -143,6 +143,17 @@ public class HealthGoalServiceImpl extends ServiceImpl<HealthGoalMapper, HealthG
                     .last("LIMIT 1");
             current = this.getOne(wrapper);
         }
+
+        if (current == null) {
+            // 查找最近失败的目标
+            wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(HealthGoal::getAccountId, accountId)
+                    .eq(HealthGoal::getGoalStatus, GoalStatus.FAILED.code)
+                    .orderByDesc(HealthGoal::getTargetDate)
+                    .orderByDesc(HealthGoal::getGoalId)
+                    .last("LIMIT 1");
+            current = this.getOne(wrapper);
+       }
 
         return current;
     }

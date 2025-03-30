@@ -1,5 +1,6 @@
 package cn.polister.infosys.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
 import cn.polister.infosys.entity.MedicationReminder;
 import cn.polister.infosys.entity.ResponseResult;
@@ -76,6 +77,7 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
     @Transactional
     public ResponseResult<Void> updateReminder(MedicationReminder reminder) {
         // 更新主表
+        reminder.setNextReminderTime(this.calculateNextReminderTime(reminder));
         if (!this.updateById(reminder)) {
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR, "更新失败");
         }
@@ -104,6 +106,7 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
             wrapper.le("start_time", endDate);
         }
         wrapper.orderByDesc("start_time");
+        wrapper.eq("account_id", StpUtil.getLoginIdAsLong());
 
         return this.page(new Page<>(pageNum, pageSize), wrapper);
     }
@@ -189,20 +192,15 @@ public class MedicationReminderServiceImpl extends ServiceImpl<MedicationReminde
         LambdaQueryWrapper<MedicationReminder> wrapper = new LambdaQueryWrapper<MedicationReminder>()
                 .eq(MedicationReminder::getAccountId, accountId)
                 .eq(MedicationReminder::getCompletionStatus, 0)
-                .orderByAsc(MedicationReminder::getNextReminderTime);
+                .orderByAsc(MedicationReminder::getNextReminderTime)
+                .last("limit 6");
 
         List<MedicationReminder> reminders = this.list(wrapper);
         if (reminders.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // 获取最早的下次提醒时间
-        Date earliestTime = reminders.get(0).getNextReminderTime();
-
-        // 返回所有具有相同最早提醒时间的提醒
-        return reminders.stream()
-                .filter(r -> r.getNextReminderTime().equals(earliestTime))
-                .toList();
+        return reminders;
     }
 
     @Override
