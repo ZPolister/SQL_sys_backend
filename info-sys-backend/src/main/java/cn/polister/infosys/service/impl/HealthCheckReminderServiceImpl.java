@@ -1,5 +1,6 @@
 package cn.polister.infosys.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.polister.infosys.entity.HealthCheckReminder;
 import cn.polister.infosys.entity.HealthCheckConfirmation;
 import cn.polister.infosys.entity.ResponseResult;
@@ -55,7 +56,12 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
 
         reminder.setCompletionStatus(0);
         reminder.setReminderCount(0);
-        reminder.setNextReminderTime(reminder.getScheduledTime());
+        if (reminder.getScheduledTime().before(new Date())) {
+            reminder.setScheduledTime(getNextCheckTime(reminder));
+            reminder.setNextReminderTime(reminder.getScheduledTime());
+        } else {
+            reminder.setNextReminderTime(reminder.getScheduledTime());
+        }
         this.save(reminder);
 
         // 创建确认记录
@@ -71,6 +77,14 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
     @Override
     @Transactional
     public ResponseResult<Void> updateReminder(HealthCheckReminder reminder) {
+
+        if (reminder.getScheduledTime().before(new Date())) {
+            reminder.setScheduledTime(getNextCheckTime(reminder));
+            reminder.setNextReminderTime(reminder.getScheduledTime());
+        } else {
+            reminder.setNextReminderTime(reminder.getScheduledTime());
+        }
+
         if (!this.updateById(reminder)) {
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR, "更新失败");
         }
@@ -97,6 +111,7 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
             wrapper.le("scheduled_time", endDate);
         }
         wrapper.orderByAsc("scheduled_time");
+        wrapper.eq("account_id", StpUtil.getLoginIdAsLong());
         return this.page(new Page<>(pageNum, pageSize), wrapper);
     }
 
@@ -175,17 +190,10 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
         nextReminder.setReminderContent(currentReminder.getReminderContent());
         nextReminder.setCheckFrequencyDays(currentReminder.getCheckFrequencyDays());
 
-        // 计算下次体检时间
-        LocalDateTime nextCheckTime = currentReminder.getScheduledTime().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+        Date nextCheckTime = getNextCheckTime(currentReminder);
 
-        if (currentReminder.getCheckFrequencyDays() != null && currentReminder.getCheckFrequencyDays() > 0) {
-            nextCheckTime = nextCheckTime.plusDays(currentReminder.getCheckFrequencyDays());
-        }
-
-        nextReminder.setScheduledTime(Date.from(nextCheckTime.atZone(ZoneId.systemDefault()).toInstant()));
-        nextReminder.setNextReminderTime(nextReminder.getScheduledTime());
+        nextReminder.setScheduledTime(nextCheckTime);
+        nextReminder.setNextReminderTime(nextCheckTime);
         nextReminder.setCompletionStatus(0);
         nextReminder.setReminderCount(0);
 
@@ -197,6 +205,18 @@ public class HealthCheckReminderServiceImpl extends ServiceImpl<HealthCheckRemin
         nextConfirmation.setConfirmationToken(UUID.randomUUID().toString());
         nextConfirmation.setIsConfirmed(0);
         healthCheckConfirmationMapper.insert(nextConfirmation);
+    }
+
+    private static Date getNextCheckTime(HealthCheckReminder currentReminder) {
+        // 计算下次体检时间
+        LocalDateTime nextCheckTime = currentReminder.getScheduledTime().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        if (currentReminder.getCheckFrequencyDays() != null && currentReminder.getCheckFrequencyDays() > 0) {
+            nextCheckTime = nextCheckTime.plusDays(currentReminder.getCheckFrequencyDays());
+        }
+        return Date.from(nextCheckTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     @Value("${confirm-url}")
