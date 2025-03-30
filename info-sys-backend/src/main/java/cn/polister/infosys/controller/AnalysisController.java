@@ -56,7 +56,7 @@ public class AnalysisController {
 //            }
             // 调用大模型生成结果
             return aiService.streamAnalysis(accountId)
-                    .concatWithValues("\n[分析结束]");
+                    .concatWithValues("\n <b>* 以上为AI根据系统内数据自动生成的分析与建议，仅供参考，若有疑问请咨询专业医师。<\\b>");
         });
     }
 }
