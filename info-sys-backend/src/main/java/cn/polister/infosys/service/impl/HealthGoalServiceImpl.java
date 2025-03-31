@@ -126,35 +126,12 @@ public class HealthGoalServiceImpl extends ServiceImpl<HealthGoalMapper, HealthG
     public HealthGoal getCurrentGoal() {
         Long accountId = StpUtil.getLoginIdAsLong();
 
-        // 查找进行中的目标
+        // 查找目标
         LambdaQueryWrapper<HealthGoal> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(HealthGoal::getAccountId, accountId)
-                .eq(HealthGoal::getGoalStatus, GoalStatus.IN_PROGRESS.code)
+                .orderByDesc(HealthGoal::getCreatedAt)
                 .last("LIMIT 1");
-        HealthGoal current = this.getOne(wrapper);
 
-        if (current == null) {
-            // 查找最近达成的目标
-            wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(HealthGoal::getAccountId, accountId)
-                    .eq(HealthGoal::getGoalStatus, GoalStatus.ACHIEVED.code)
-                    .orderByDesc(HealthGoal::getTargetDate)
-                    .orderByDesc(HealthGoal::getGoalId)
-                    .last("LIMIT 1");
-            current = this.getOne(wrapper);
-        }
-
-        if (current == null) {
-            // 查找最近失败的目标
-            wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(HealthGoal::getAccountId, accountId)
-                    .eq(HealthGoal::getGoalStatus, GoalStatus.FAILED.code)
-                    .orderByDesc(HealthGoal::getTargetDate)
-                    .orderByDesc(HealthGoal::getGoalId)
-                    .last("LIMIT 1");
-            current = this.getOne(wrapper);
-       }
-
-        return current;
+        return this.getOne(wrapper);
     }
 }
