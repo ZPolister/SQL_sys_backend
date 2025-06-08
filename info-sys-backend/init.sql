@@ -8,7 +8,7 @@ CREATE TABLE `account` (
                            `password_hash` VARCHAR(100) NOT NULL COMMENT '加密密码',
                            `account_type` TINYINT NOT NULL DEFAULT 0 COMMENT '账户类型（0-个人，1-管理员）',
                            `email` VARCHAR(100) COMMENT '邮箱',
-                           `phone_number` VARCHAR(20) COMMENT '手机号码',
+                           `birthday` VARCHAR(20) COMMENT '生日',
                            `account_status` TINYINT NOT NULL DEFAULT 1 COMMENT '账户状态（0-停用，1-启用）',
                            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                            PRIMARY KEY (`account_id`),
